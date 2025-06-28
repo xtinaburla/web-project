@@ -1,0 +1,37 @@
+const functions = require('firebase-functions');
+const admin = require('firebase-admin');
+const nodemailer = require('nodemailer');
+
+admin.initializeApp();
+
+// Настройте Gmail (используйте "ключ приложения", а не пароль!)
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    "user": "burlachristina@gmail.com", // Замените на ваш Gmail
+    "pass": "jakr lgho icdh ulhk" // Пароль или ключ приложения
+  }
+});
+
+exports.sendOrderEmail = functions.firestore
+  .document('orders/{orderId}')
+  .onCreate(async (snap, context) => {
+    const order = snap.data();
+    
+    const mailOptions = {
+      from: '"Типография Призма" <ваш_email@gmail.com>',
+      to: 'manager@prisma-print.ru',  // Email менеджера
+      subject: `Новый заказ №${context.params.orderId}`,
+      html: `
+        <h2>Поступил новый заказ</h2>
+        <p><strong>Номер:</strong> ${context.params.orderId}</p>
+        <p><strong>Клиент:</strong> ${order.userEmail}</p>
+        <p><strong>Тип продукта:</strong> ${order.productName}</p>
+        <p><strong>Количество:</strong> ${order.quantity} шт.</p>
+        <p><strong>Сумма:</strong> ${order.price} ₽</p>
+      `
+    };
+    
+    await transporter.sendMail(mailOptions);
+    console.log('Письмо отправлено!');
+  });

@@ -1,0 +1,8 @@
+# Игнорируемые папки/файлы
+node_modules/
+.firebase/
+.firebaserc
+.env
+firebase-debug.log
+CLIENTS_DB.json
+ORDERS_DB
