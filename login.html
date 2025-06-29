@@ -585,7 +585,8 @@
             projectId: "prisma-print",
             storageBucket: "prisma-print.appspot.com",
             messagingSenderId: "165546230296",
-            appId: "1:165546230296:web:7b816c389d23f5b762396d"         };
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"         
+        };
 
         // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
@@ -600,16 +601,19 @@
         const allOrdersContent = document.getElementById('all-orders');
         const accountLink = document.getElementById('account-link');
 
-        // Переключение между формами
+        // Переключение между формами входа и регистрации
         document.getElementById('show-register').addEventListener('click', function() {
             loginForm.style.display = 'none';
             registerForm.style.display = 'block';
+            verifyForm.style.display = 'none';
+            ordersContainer.style.display = 'none';
         });
         
         document.getElementById('show-login').addEventListener('click', function() {
             registerForm.style.display = 'none';
             verifyForm.style.display = 'none';
             loginForm.style.display = 'block';
+            ordersContainer.style.display = 'none';
         });
 
         // Проверка совпадения паролей при регистрации
@@ -664,6 +668,8 @@
                 // 4. Показываем форму для ввода кода подтверждения
                 registerForm.style.display = 'none';
                 verifyForm.style.display = 'block';
+                loginForm.style.display = 'none';
+                ordersContainer.style.display = 'none';
                 
                 alert('Письмо с подтверждением отправлено на вашу почту!');
             } catch (error) {
@@ -691,6 +697,8 @@
                     alert('Email успешно подтвержден! Теперь вы можете войти.');
                     verifyForm.style.display = 'none';
                     loginForm.style.display = 'block';
+                    registerForm.style.display = 'none';
+                    ordersContainer.style.display = 'none';
                 }
             } catch (error) {
                 alert('Ошибка подтверждения: ' + error.message);
