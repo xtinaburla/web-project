@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Типография Призма</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+    <style>
+        :root {
+            --primary: #239439;
+            --primary-dark: #1c7a2e;
+            --secondary: #A9B4B5;
+            --dark: #333333;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --light-gray: #e9ecef;
+            --danger: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background-color: var(--gray);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        header {
+            background-color: var(--primary);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 50px;
+        }
+        
+        .logo h1 {
+            color: var(--light);
+            font-size: 24px;
+            font-weight: 500;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            font-size: 16px;
+            position: relative;
+        }
+        
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background: var(--light);
+            bottom: -5px;
+            left: 0;
+            transition: width 0.3s;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        .hero-account {
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
+                        url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
+            color: var(--light);
+            padding: 100px 0;
+            text-align: center;
+            position: relative;
+        }
+        
+        .hero-account h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+        }
+        
+        .account-section {
+            padding: 60px 0 80px;
+        }
+        
+        .account-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+        }
+        
+        .auth-form {
+            background: var(--light);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            width: 100%;
+            max-width: 500px;
+        }
+        
+        .auth-form h2 {
+            color: var(--primary);
+            font-size: 28px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--secondary);
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--light);
+            border: none;
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: 500;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-link {
+            background: none;
+            color: var(--primary);
+            text-decoration: underline;
+            padding: 0;
+            width: auto;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-3 {
+            margin-top: 15px;
+        }
+        
+        .text-danger {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 50px 0 20px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 40px;
+            margin-bottom: 30px;
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="https://xtinaburla.github.io/prismalogo.jpg" alt="Логотип Призма">
+                <h1>Призма</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="login.html">Вход</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-account">
+        <div class="container">
+            <h1>Регистрация</h1>
+        </div>
+    </section>
+
+    <section class="account-section">
+        <div class="container">
+            <div class="account-container">
+                <div class="auth-form">
+                    <h2>Создать аккаунт</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="reg-name">Имя</label>
+                            <input type="text" class="form-control" id="reg-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-surname">Фамилия</label>
+                            <input type="text" class="form-control" id="reg-surname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">Телефон</label>
+                            <input type="tel" class="form-control" id="reg-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Электронная почта</label>
+                            <input type="email" class="form-control" id="reg-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-company">Название компании или ИНН</label>
+                            <input type="text" class="form-control" id="reg-company" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Пароль</label>
+                            <input type="password" class="form-control" id="reg-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Подтвердите пароль</label>
+                            <input type="password" class="form-control" id="reg-confirm-password" required>
+                            <div class="text-danger" id="password-match-error">Пароли не совпадают</div>
+                        </div>
+                        <button type="submit" class="btn">Зарегистрироваться</button>
+                        <div class="text-center mt-3">
+                            <a href="login.html" class="btn-link">Уже есть аккаунт? Войдите</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-column">
+                    <h3>Контакты</h3>
+                    <ul>
+                        <li>г. Иркутск, ул. Рабочего Штаба, 78/5</li>
+                        <li>+7 (395) 248-22-02</li>
+                        <li>prisma-irk@mail.ru</li>
+                    </ul>
+                </div>
+                <div class="footer-column">
+                    <h3>Компания</h3>
+                    <ul>
+                        <li><a href="mission.html">Наша миссия</a></li>
+                        <li><a href="payment.html">Оплата</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2025 ООО"Типография Призма". Все права защищены.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
+            authDomain: "prisma-print.firebaseapp.com",
+            projectId: "prisma-print",
+            storageBucket: "prisma-print.appspot.com",
+            messagingSenderId: "165546230296",
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Проверка совпадения паролей
+        document.getElementById('reg-confirm-password').addEventListener('input', function() {
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = this.value;
+            const errorElement = document.getElementById('password-match-error');
+            
+            if (password !== confirmPassword) {
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Обработка формы регистрации
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                alert('Пароли не совпадают!');
+                return;
+            }
+
+            try {
+                // Создание пользователя
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Сохранение дополнительных данных в Firestore
+                await db.collection('clients').doc(user.uid).set({
+                    name: document.getElementById('reg-name').value,
+                    surname: document.getElementById('reg-surname').value,
+                    phone: document.getElementById('reg-phone').value,
+                    email: email,
+                    company: document.getElementById('reg-company').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Отправка письма для подтверждения email
+                await user.sendEmailVerification();
+                
+                alert('Регистрация успешна! На вашу почту отправлено письмо для подтверждения.');
+                window.location.href = 'login.html';
+            } catch (error) {
+                alert('Ошибка регистрации: ' + error.message);
+            }
+        });
+
+        // Проверка состояния аутентификации
+        auth.onAuthStateChanged((user) => {
+            if (user && user.emailVerified) {
+                window.location.href = 'account.html';
+            }
+        });
+    </script>
+</body>
+</html>
