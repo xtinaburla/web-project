@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Личный кабинет | Типография Призма</title>
+    <title>Вход | Типография Призма</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
@@ -40,7 +40,6 @@
             padding: 0 20px;
         }
         
-        /* Шапка */
         header {
             background-color: var(--primary);
             padding: 15px 0;
@@ -106,7 +105,6 @@
             width: 100%;
         }
         
-        /* Герой-секция */
         .hero-account {
             background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), 
                         url('https://images.unsplash.com/photo-1551288049-bebda4e38f71?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80') center/cover;
@@ -119,10 +117,8 @@
         .hero-account h1 {
             font-size: 42px;
             margin-bottom: 20px;
-            animation: fadeInDown 1s ease;
         }
         
-        /* Основной контент */
         .account-section {
             padding: 60px 0 80px;
         }
@@ -141,12 +137,6 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 500px;
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        
-        .auth-form:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
         }
         
         .auth-form h2 {
@@ -154,19 +144,6 @@
             font-size: 28px;
             margin-bottom: 25px;
             text-align: center;
-            position: relative;
-            display: inline-block;
-            width: 100%;
-        }
-        
-        .auth-form h2::after {
-            content: '';
-            position: absolute;
-            width: 50%;
-            height: 3px;
-            background: var(--secondary);
-            bottom: -10px;
-            left: 25%;
         }
         
         .form-group {
@@ -185,12 +162,6 @@
             border: 1px solid var(--secondary);
             border-radius: 4px;
             font-size: 16px;
-            transition: border-color 0.3s;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--primary);
         }
         
         .btn {
@@ -203,7 +174,6 @@
             font-weight: 500;
             border-radius: 4px;
             cursor: pointer;
-            transition: background-color 0.3s;
             width: 100%;
         }
         
@@ -219,11 +189,6 @@
             width: auto;
         }
         
-        .btn-link:hover {
-            background: none;
-            color: var(--primary-dark);
-        }
-        
         .text-center {
             text-align: center;
         }
@@ -232,105 +197,6 @@
             margin-top: 15px;
         }
         
-        .mt-4 {
-            margin-top: 20px;
-        }
-        
-        .text-danger {
-            color: var(--danger);
-            font-size: 14px;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .orders-container {
-            background: var(--light);
-            border-radius: 8px;
-            padding: 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
-            width: 100%;
-            max-width: 800px;
-            margin-top: 40px;
-            display: none;
-        }
-        
-        .orders-container h2 {
-            color: var(--primary);
-            font-size: 24px;
-            margin-bottom: 20px;
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 10px;
-        }
-        
-        .order-item {
-            border: 1px solid var(--light-gray);
-            border-radius: 5px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-        
-        .order-number {
-            color: var(--primary);
-        }
-        
-        .order-date {
-            color: var(--secondary);
-        }
-        
-        .order-details {
-            color: var(--dark);
-        }
-        
-        .no-orders {
-            text-align: center;
-            padding: 30px;
-            color: var(--secondary);
-        }
-        
-        /* Табы */
-        .tabs {
-            display: flex;
-            margin-bottom: 30px;
-            border-bottom: 1px solid var(--secondary);
-        }
-        
-        .tab {
-            padding: 10px 20px;
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .tab.active {
-            color: var(--primary);
-            font-weight: 500;
-        }
-        
-        .tab.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background-color: var(--primary);
-        }
-        
-        .tab-content {
-            display: none;
-        }
-        
-        .tab-content.active {
-            display: block;
-        }
-        
-        /* Футер */
         footer {
             background-color: var(--dark);
             color: var(--light);
@@ -344,88 +210,14 @@
             margin-bottom: 30px;
         }
         
-        .footer-column h3 {
-            font-size: 18px;
-            margin-bottom: 20px;
-            color: var(--secondary);
-        }
-        
-        .footer-column ul {
-            list-style: none;
-        }
-        
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-column ul li a {
-            color: var(--light);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-column ul li a:hover {
-            color: var(--secondary);
-        }
-        
         .copyright {
             text-align: center;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
-        }
-        
-        /* Анимации */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes fadeInDown {
-            from { 
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        /* Адаптивность */
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            nav ul {
-                gap: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
-            }
-            
-            .hero-account {
-                padding: 80px 0;
-            }
-            
-            .hero-account h1 {
-                font-size: 32px;
-            }
-            
-            .auth-form {
-                padding: 30px 20px;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-                gap: 30px;
-            }
         }
     </style>
 </head>
 <body>
-    <!-- Шапка -->
     <header>
         <div class="container header-content">
             <div class="logo">
@@ -436,122 +228,42 @@
                 <ul>
                     <li><a href="index.html">Главная</a></li>
                     <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="#" id="account-link">Личный кабинет</a></li>
+                    <li><a href="register.html">Регистрация</a></li>
                 </ul>
             </nav>
         </div>
     </header>
 
-    <!-- Герой-секция -->
     <section class="hero-account">
         <div class="container">
-            <h1>Личный кабинет</h1>
+            <h1>Вход в личный кабинет</h1>
         </div>
     </section>
 
-    <!-- Основной контент -->
     <section class="account-section">
         <div class="container">
             <div class="account-container">
-                <!-- Форма входа -->
-                <div class="auth-form" id="login-form">
-                    <h2>Вход в личный кабинет</h2>
+                <div class="auth-form">
+                    <h2>Вход</h2>
                     <form id="loginForm">
                         <div class="form-group">
                             <label for="login-email">Электронная почта</label>
                             <input type="email" class="form-control" id="login-email" required>
-                            <div class="text-danger" id="login-email-error">Пожалуйста, введите корректный email</div>
                         </div>
                         <div class="form-group">
                             <label for="login-password">Пароль</label>
                             <input type="password" class="form-control" id="login-password" required>
-                            <div class="text-danger" id="login-password-error">Пожалуйста, введите пароль</div>
                         </div>
                         <button type="submit" class="btn">Войти</button>
                         <div class="text-center mt-3">
-                            <button type="button" class="btn-link" id="show-register">Нет аккаунта? Зарегистрируйтесь</button>
+                            <a href="register.html" class="btn-link">Нет аккаунта? Зарегистрируйтесь</a>
                         </div>
                     </form>
-                </div>
-                
-                <!-- Форма регистрации -->
-                <div class="auth-form" id="register-form" style="display: none;">
-                    <h2>Регистрация</h2>
-                    <form id="registerForm">
-                        <div class="form-group">
-                            <label for="reg-name">Имя</label>
-                            <input type="text" class="form-control" id="reg-name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-surname">Фамилия</label>
-                            <input type="text" class="form-control" id="reg-surname" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-patronymic">Отчество (необязательно)</label>
-                            <input type="text" class="form-control" id="reg-patronymic">
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-phone">Телефон</label>
-                            <input type="tel" class="form-control" id="reg-phone" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-email">Электронная почта</label>
-                            <input type="email" class="form-control" id="reg-email" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-company">Название компании или ИНН</label>
-                            <input type="text" class="form-control" id="reg-company" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-password">Пароль</label>
-                            <input type="password" class="form-control" id="reg-password" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="reg-confirm-password">Подтвердите пароль</label>
-                            <input type="password" class="form-control" id="reg-confirm-password" required>
-                            <div class="text-danger" id="password-match-error">Пароли не совпадают</div>
-                        </div>
-                        <button type="submit" class="btn">Зарегистрироваться</button>
-                        <div class="text-center mt-3">
-                            <button type="button" class="btn-link" id="show-login">Уже есть аккаунт? Войдите</button>
-                        </div>
-                    </form>
-                </div>
-                
-                <!-- Форма подтверждения email -->
-                <div class="auth-form" id="verify-form" style="display: none;">
-                    <h2>Подтверждение email</h2>
-                    <p>На вашу почту отправлен код подтверждения. Введите его ниже:</p>
-                    <form id="verifyForm">
-                        <div class="form-group">
-                            <label for="verify-code">Код подтверждения</label>
-                            <input type="text" class="form-control" id="verify-code" required>
-                        </div>
-                        <button type="submit" class="btn">Подтвердить</button>
-                        <div class="text-center mt-3">
-                            <button type="button" class="btn-link" id="resend-code">Отправить код повторно</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            
-            <!-- Список заказов (показывается после входа) -->
-            <div class="orders-container" id="orders-container">
-                <h2>Мои заявки</h2>
-                <div class="tabs">
-                    <div class="tab active" data-tab="all">Все заявки</div>
-                </div>
-                
-                <div class="tab-content active" data-tab-content="all" id="all-orders">
-                    <div class="no-orders">
-                        <p>Загрузка заказов...</p>
-                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Футер -->
     <footer>
         <div class="container">
             <div class="footer-content">
@@ -585,243 +297,43 @@
             projectId: "prisma-print",
             storageBucket: "prisma-print.appspot.com",
             messagingSenderId: "165546230296",
-            appId: "1:165546230296:web:7b816c389d23f5b762396d"         
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        // Инициализация Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Элементы DOM
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const verifyForm = document.getElementById('verify-form');
-        const ordersContainer = document.getElementById('orders-container');
-        const allOrdersContent = document.getElementById('all-orders');
-        const accountLink = document.getElementById('account-link');
-
-        // Переключение между формами входа и регистрации
-        document.getElementById('show-register').addEventListener('click', function() {
-            loginForm.style.display = 'none';
-            registerForm.style.display = 'block';
-            verifyForm.style.display = 'none';
-            ordersContainer.style.display = 'none';
-        });
-        
-        document.getElementById('show-login').addEventListener('click', function() {
-            registerForm.style.display = 'none';
-            verifyForm.style.display = 'none';
-            loginForm.style.display = 'block';
-            ordersContainer.style.display = 'none';
-        });
-
-        // Проверка совпадения паролей при регистрации
-        document.getElementById('reg-confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('reg-password').value;
-            const confirmPassword = this.value;
-            const errorElement = document.getElementById('password-match-error');
-            
-            if (password !== confirmPassword) {
-                errorElement.style.display = 'block';
-            } else {
-                errorElement.style.display = 'none';
-            }
-        });
-
-        // Регистрация нового пользователя
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-            const name = document.getElementById('reg-name').value;
-            const phone = document.getElementById('reg-phone').value;
-            const company = document.getElementById('reg-company').value;
-            
-            // Проверка совпадения паролей
-            if (document.getElementById('reg-password').value !== 
-                document.getElementById('reg-confirm-password').value) {
-                alert('Пароли не совпадают!');
-                return;
-            }
-
-            try {
-                // 1. Создаем пользователя в Firebase Auth
-                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-                
-                // 2. Сохраняем дополнительные данные в Firestore
-                await db.collection('clients').doc(userCredential.user.uid).set({
-                    name: name,
-                    surname: document.getElementById('reg-surname').value,
-                    patronymic: document.getElementById('reg-patronymic').value,
-                    phone: phone,
-                    email: email,
-                    company: company,
-                    verified: false,
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                
-                // 3. Отправляем письмо для подтверждения email
-                await userCredential.user.sendEmailVerification();
-                
-                // 4. Показываем форму для ввода кода подтверждения
-                registerForm.style.display = 'none';
-                verifyForm.style.display = 'block';
-                loginForm.style.display = 'none';
-                ordersContainer.style.display = 'none';
-                
-                alert('Письмо с подтверждением отправлено на вашу почту!');
-            } catch (error) {
-                alert('Ошибка регистрации: ' + error.message);
-            }
-        });
-
-        // Подтверждение email
-        document.getElementById('verifyForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const code = document.getElementById('verify-code').value;
-            
-            // В реальном приложении здесь должна быть проверка кода
-            // Для демонстрации просто считаем, что код верный
-            
-            try {
-                // Обновляем статус подтверждения в Firestore
-                const user = auth.currentUser;
-                if (user) {
-                    await db.collection('clients').doc(user.uid).update({
-                        verified: true
-                    });
-                    
-                    alert('Email успешно подтвержден! Теперь вы можете войти.');
-                    verifyForm.style.display = 'none';
-                    loginForm.style.display = 'block';
-                    registerForm.style.display = 'none';
-                    ordersContainer.style.display = 'none';
-                }
-            } catch (error) {
-                alert('Ошибка подтверждения: ' + error.message);
-            }
-        });
-
-        // Повторная отправка кода подтверждения
-        document.getElementById('resend-code').addEventListener('click', async () => {
-            const user = auth.currentUser;
-            if (user) {
-                try {
-                    await user.sendEmailVerification();
-                    alert('Письмо с кодом подтверждения отправлено повторно!');
-                } catch (error) {
-                    alert('Ошибка: ' + error.message);
-                }
-            }
-        });
-
-        // Вход пользователя
-        document.getElementById('loginForm').addEventListener('submit', async (e) => {
+        // Обработка формы входа
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
             
             try {
-                await auth.signInWithEmailAndPassword(email, password);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
                 
-                // Проверяем, подтвержден ли email
-                const user = auth.currentUser;
                 if (user && !user.emailVerified) {
                     alert('Пожалуйста, подтвердите ваш email перед входом.');
                     await auth.signOut();
                     return;
                 }
                 
-                // Показываем личный кабинет
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'none';
-                verifyForm.style.display = 'none';
-                ordersContainer.style.display = 'block';
-                
-                // Загружаем заказы пользователя
-                loadUserOrders(user.uid);
+                // Перенаправление в личный кабинет после успешного входа
+                window.location.href = 'account.html';
             } catch (error) {
                 alert('Ошибка входа: ' + error.message);
             }
         });
 
-        // Загрузка заказов пользователя
-        async function loadUserOrders(userId) {
-            try {
-                const ordersSnapshot = await db.collection('orders')
-                    .where('userId', '==', userId)
-                    .orderBy('createdAt', 'desc')
-                    .get();
-                
-                allOrdersContent.innerHTML = '';
-                
-                if (ordersSnapshot.empty) {
-                    allOrdersContent.innerHTML = `
-                        <div class="no-orders">
-                            <p>У вас пока нет заказов</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                ordersSnapshot.forEach(doc => {
-                    const order = doc.data();
-                    const orderDate = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'Дата не указана';
-                    
-                    allOrdersContent.innerHTML += `
-                        <div class="order-item">
-                            <div class="order-header">
-                                <span class="order-number">Заказ #${doc.id}</span>
-                                <span class="order-date">${orderDate}</span>
-                            </div>
-                            <div class="order-details">
-                                <p>Тип: ${order.productType || 'Не указан'}</p>
-                                <p>Количество: ${order.quantity || 'Не указано'}</p>
-                                <p>Статус: ${order.status || 'Новый'}</p>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                console.error('Ошибка загрузки заказов:', error);
-                allOrdersContent.innerHTML = `
-                    <div class="no-orders">
-                        <p>Ошибка загрузки заказов</p>
-                    </div>
-                `;
-            }
-        }
-
-        // Проверка состояния аутентификации при загрузке страницы
+        // Проверка состояния аутентификации
         auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Пользователь авторизован
-                loginForm.style.display = 'none';
-                registerForm.style.display = 'none';
-                verifyForm.style.display = 'none';
-                ordersContainer.style.display = 'block';
-                loadUserOrders(user.uid);
-                accountLink.style.display = 'none';
-            } else {
-                // Пользователь не авторизован
-                loginForm.style.display = 'block';
-                registerForm.style.display = 'none';
-                verifyForm.style.display = 'none';
-                ordersContainer.style.display = 'none';
-                accountLink.style.display = 'block';
+            if (user && user.emailVerified) {
+                window.location.href = 'account.html';
             }
         });
-
-        // Выход из системы (можно добавить кнопку в личном кабинете)
-        function logout() {
-            auth.signOut().then(() => {
-                window.location.reload();
-            });
-        }
     </script>
 </body>
 </html>
