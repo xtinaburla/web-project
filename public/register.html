@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация | Типография Призма</title>
     <style>
-        /* Стили остаются без изменений */
+        /* Все стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -372,14 +372,14 @@
                 
                 // 3. Отправляем письмо подтверждения
                 await user.sendEmailVerification({
-                    url: window.location.origin + '/login.html'
+                    url: window.location.origin + '/verify.html'
                 });
                 
                 // 4. Выходим из системы, пока email не подтвержден
                 await auth.signOut();
                 
                 // 5. Перенаправляем на страницу подтверждения
-                window.location.href = 'verify.html';
+                window.location.href = 'verify.html?email=' + encodeURIComponent(email);
                 
             } catch (error) {
                 console.error('Ошибка регистрации:', error);
