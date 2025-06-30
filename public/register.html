@@ -377,7 +377,7 @@
         </div>
     </footer>
 
-     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <script>
@@ -416,7 +416,7 @@
                 
                 // 2. Сохраняем данные в Firestore
                 await db.collection('clients').doc(user.uid).set({
-                    uid: user.uid, // Добавляем UID
+                    uid: user.uid,
                     name: document.getElementById('reg-name').value,
                     surname: document.getElementById('reg-surname').value,
                     phone: document.getElementById('reg-phone').value,
@@ -446,6 +446,9 @@
                         break;
                     case 'auth/weak-password':
                         errorMessage = 'Пароль должен быть не менее 6 символов';
+                        break;
+                    case 'auth/unauthorized-continue-uri':
+                        errorMessage = 'Домен не разрешен для перенаправления. Сообщите администратору.';
                         break;
                     default:
                         errorMessage = error.message;
