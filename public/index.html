@@ -1282,64 +1282,75 @@
         document.getElementById('price-calculator').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Проверка авторизации
-            const user = auth.currentUser;
-            if (!user) {
-                alert('Для оформления заказа войдите в систему!');
-                window.location.href = 'login.html';
-                return;
-            }
+            const orderButton = document.getElementById('order-button');
+            orderButton.disabled = true;
+            orderButton.textContent = 'Оформление...';
             
-            // Сбор данных заказа
-            const orderData = {
-                userId: user.uid,
-                userEmail: user.email,
-                productType: document.getElementById('product-type').value,
-                productName: document.getElementById('product-type').options[document.getElementById('product-type').selectedIndex].text,
-                quantity: parseInt(document.getElementById('quantity').value),
-                material: document.getElementById('material-type').value,
-                materialName: document.getElementById('material-type').options[document.getElementById('material-type').selectedIndex].text,
-                density: document.querySelector('input[name="density"]:checked').value,
-                lamination: document.querySelector('input[name="lamination"]:checked').value,
-                foilType: document.getElementById('foil-type').value,
-                comment: document.getElementById('order-comment').value,
-                price: parseFloat(document.querySelector('.total-price').textContent.replace(' ₽', '')),
-                status: 'new',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
-
             try {
+                const user = auth.currentUser;
+                if (!user) {
+                    alert('Для оформления заказа войдите в систему!');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Сбор данных заказа
+                const orderData = {
+                    userId: user.uid,
+                    userEmail: user.email,
+                    userName: user.displayName || 'Не указано',
+                    productType: document.getElementById('product-type').value,
+                    productName: document.getElementById('product-type').options[document.getElementById('product-type').selectedIndex].text,
+                    quantity: parseInt(document.getElementById('quantity').value),
+                    material: document.getElementById('material-type').value,
+                    materialName: document.getElementById('material-type').options[document.getElementById('material-type').selectedIndex].text,
+                    density: document.querySelector('input[name="density"]:checked').value,
+                    lamination: document.querySelector('input[name="lamination"]:checked').value,
+                    foilType: document.getElementById('foil-type').value,
+                    comment: document.getElementById('order-comment').value,
+                    price: parseFloat(document.querySelector('.total-price').textContent.replace(' ₽', '')),
+                    status: 'new',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
                 // 1. Сохраняем заказ в Firestore
                 const docRef = await db.collection('orders').add(orderData);
-                console.log('Заказ сохранен с ID:', docRef.id);
+                console.log('Order saved with ID:', docRef.id);
                 
                 // 2. Загрузка файла (если есть)
+                let fileUrl = '';
                 const fileInput = document.getElementById('file-upload');
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
                     const fileRef = storage.ref(`orders/${docRef.id}/${file.name}`);
                     await fileRef.put(file);
-                    const fileUrl = await fileRef.getDownloadURL();
-                    await db.collection('orders').doc(docRef.id).update({
-                        fileUrl: fileUrl,
-                        fileName: file.name
-                    });
+                    fileUrl = await fileRef.getDownloadURL();
+                    await docRef.update({ fileUrl: fileUrl, fileName: file.name });
                 }
                 
-                // 3. Отправка email уведомления через Cloud Function
-                const sendEmail = functions.httpsCallable('sendOrderEmail');
-                await sendEmail({
-                    orderId: docRef.id,
-                    ...orderData
-                });
+                // 3. Отправка email
+                try {
+                    const sendEmail = functions.httpsCallable('sendOrderEmail');
+                    await sendEmail({
+                        orderId: docRef.id,
+                        ...orderData,
+                        fileUrl: fileUrl || 'нет'
+                    });
+                } catch (emailError) {
+                    console.warn('Email sending failed:', emailError);
+                    // Не прерываем процесс, просто логируем ошибку
+                }
                 
                 // 4. Уведомление пользователя
                 alert(`Заказ №${docRef.id} успешно оформлен! Менеджер свяжется с вами в ближайшее время.`);
                 window.location.href = 'account.html';
                 
             } catch (error) {
-                console.error('Ошибка:', error);
+                console.error('Ошибка оформления заказа:', error);
                 alert('Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.');
+            } finally {
+                orderButton.disabled = false;
+                orderButton.textContent = 'Оформить заказ';
             }
         });
 
