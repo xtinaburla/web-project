@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подтверждение email | Типография Призма</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -293,19 +294,21 @@
         // Обработка повторной отправки письма
         document.getElementById('resend-email').addEventListener('click', async (e) => {
             e.preventDefault();
-            const user = auth.currentUser;
+            const email = new URLSearchParams(window.location.search).get('email');
             
-            if (user) {
+            if (email) {
                 try {
-                    await user.sendEmailVerification({
-                        url: window.location.origin + '/verify.html'
+                    // Отправляем письмо подтверждения на указанный email
+                    await auth.sendSignInLinkToEmail(email, {
+                        url: window.location.origin + '/login.html',
+                        handleCodeInApp: true
                     });
                     showStatus('Письмо отправлено повторно! Проверьте вашу почту.', 'success');
                 } catch (error) {
                     showStatus('Ошибка: ' + error.message, 'error');
                 }
             } else {
-                showStatus('Для повторной отправки письма необходимо войти в систему.', 'error');
+                showStatus('Для повторной отправки письма необходимо указать email.', 'error');
             }
         });
 
@@ -314,6 +317,11 @@
             statusMessage.textContent = message;
             statusMessage.className = 'status-message status-' + type;
             statusMessage.style.display = 'block';
+            
+            // Автоматическое скрытие сообщения через 5 секунд
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
         }
 
         // Проверяем состояние аутентификации
