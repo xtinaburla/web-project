@@ -282,24 +282,46 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        
+        // Проверка на уже инициализированное приложение
+        if (firebase.apps.length > 1) {
+            firebase.app().delete();
+        }
 
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
-            const email = document.getElementById('reg-email').value;
-            const password = document.getElementById('reg-password').value;
-            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value.trim();
+            const confirmPassword = document.getElementById('reg-confirm-password').value.trim();
+            const phone = document.getElementById('reg-phone').value.trim();
             const btn = e.target.querySelector('button[type="submit"]');
             
-            // Проверка совпадения паролей
+            // Валидация данных
+            if (!email || !email.includes('@')) {
+                alert('Пожалуйста, введите корректный email');
+                return;
+            }
+            
+            if (password.length < 6) {
+                alert('Пароль должен содержать не менее 6 символов');
+                return;
+            }
+            
             if (password !== confirmPassword) {
                 document.getElementById('password-match-error').style.display = 'block';
                 return;
             } else {
                 document.getElementById('password-match-error').style.display = 'none';
+            }
+            
+            if (!phone) {
+                alert('Пожалуйста, укажите телефон');
+                return;
             }
 
             btn.disabled = true;
@@ -313,14 +335,15 @@
                 // 2. Сохраняем данные в Firestore
                 await db.collection('clients').doc(user.uid).set({
                     uid: user.uid,
-                    name: document.getElementById('reg-name').value,
-                    surname: document.getElementById('reg-surname').value,
-                    phone: document.getElementById('reg-phone').value,
+                    name: document.getElementById('reg-name').value.trim(),
+                    surname: document.getElementById('reg-surname').value.trim(),
+                    phone: phone,
                     email: email,
-                    company: document.getElementById('reg-company').value || '',
+                    company: document.getElementById('reg-company').value.trim() || null,
                     emailVerified: false,
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                    role: 'client'
+                    role: 'client',
+                    lastLogin: null
                 });
                 
                 // 3. Отправляем письмо подтверждения
@@ -328,17 +351,18 @@
                     url: window.location.origin + '/verify.html'
                 });
                 
-                // 4. Выходим из системы, чтобы пользователь подтвердил email
-                await auth.signOut();
+                // 4. Показываем сообщение об успехе
+                alert('Регистрация успешна! На ваш email отправлено письмо для подтверждения. Пожалуйста, проверьте почту (включая папку "Спам").');
                 
                 // 5. Перенаправляем на страницу подтверждения
                 window.location.href = 'verify.html';
                 
             } catch (error) {
+                console.error('Ошибка регистрации:', error);
                 let errorMessage = 'Ошибка регистрации';
                 switch(error.code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'Email уже зарегистрирован';
+                        errorMessage = 'Email уже зарегистрирован. Попробуйте войти или восстановить пароль.';
                         break;
                     case 'auth/invalid-email':
                         errorMessage = 'Некорректный email';
@@ -346,17 +370,22 @@
                     case 'auth/weak-password':
                         errorMessage = 'Пароль должен быть не менее 6 символов';
                         break;
-                    case 'auth/unauthorized-continue-uri':
-                        errorMessage = 'Домен не разрешен для перенаправления. Сообщите администратору.';
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Регистрация с email/password временно недоступна';
                         break;
                     default:
-                        errorMessage = error.message;
+                        errorMessage = error.message || 'Произошла ошибка при регистрации';
                 }
                 alert(errorMessage);
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Зарегистрироваться';
             }
+        });
+
+        // Валидация телефона
+        document.getElementById('reg-phone').addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9+()-]/g, '');
         });
     </script>
 </body>
