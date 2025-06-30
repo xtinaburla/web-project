@@ -377,11 +377,10 @@
         </div>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <script>
-        // Инициализация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -391,107 +390,70 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        // Инициализируем Firebase в совместимом режиме (compat)
-        const app = firebase.initializeApp(firebaseConfig);
+        firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Проверка совпадения паролей
-        document.getElementById('reg-confirm-password').addEventListener('input', function() {
-            const password = document.getElementById('reg-password').value;
-            const confirmPassword = this.value;
-            const errorElement = document.getElementById('password-match-error');
-            
-            if (password !== confirmPassword && confirmPassword.length > 0) {
-                errorElement.style.display = 'block';
-            } else {
-                errorElement.style.display = 'none';
-            }
-        });
-
-        // Обработка регистрации
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
-            const confirmPassword = document.getElementById('reg-confirm-password').value;
             const btn = e.target.querySelector('button[type="submit"]');
             
-            // Проверка совпадения паролей
-            if (password !== confirmPassword) {
+            if (password !== document.getElementById('reg-confirm-password').value) {
                 document.getElementById('password-match-error').style.display = 'block';
                 return;
             }
 
-            // Блокируем кнопку на время регистрации
             btn.disabled = true;
             btn.textContent = 'Регистрация...';
 
             try {
-                // 1. Регистрация пользователя
+                // 1. Создаем пользователя в Auth
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // 2. Отправка письма для подтверждения
-                await user.sendEmailVerification();
-                
-                // 3. Сохранение дополнительных данных в Firestore
+                // 2. Сохраняем данные в Firestore
                 await db.collection('clients').doc(user.uid).set({
+                    uid: user.uid, // Добавляем UID
                     name: document.getElementById('reg-name').value,
                     surname: document.getElementById('reg-surname').value,
                     phone: document.getElementById('reg-phone').value,
                     email: email,
                     company: document.getElementById('reg-company').value || '',
-                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     emailVerified: false,
-                    role: 'client',
-                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'client'
                 });
                 
-                // 4. Показываем сообщение об успешной регистрации
-                alert('Регистрация успешна! Письмо с подтверждением отправлено на ваш email. Пожалуйста, проверьте вашу почту (включая папку "Спам").');
+                // 3. Отправляем письмо подтверждения
+                await user.sendEmailVerification({
+                    url: window.location.origin + '/verify.html'
+                });
                 
-                // 5. Перенаправление на страницу подтверждения
+                alert('Регистрация успешна! Проверьте почту для подтверждения.');
                 window.location.href = 'verify.html';
                 
             } catch (error) {
                 let errorMessage = 'Ошибка регистрации';
                 switch(error.code) {
                     case 'auth/email-already-in-use':
-                        errorMessage = 'Этот email уже зарегистрирован';
+                        errorMessage = 'Email уже зарегистрирован';
                         break;
                     case 'auth/invalid-email':
                         errorMessage = 'Некорректный email';
                         break;
                     case 'auth/weak-password':
-                        errorMessage = 'Пароль должен содержать не менее 6 символов';
-                        break;
-                    case 'auth/operation-not-allowed':
-                        errorMessage = 'Регистрация по email/password отключена';
-                        break;
-                    case 'permission-denied':
-                        errorMessage = 'Недостаточно прав для выполнения операции. Пожалуйста, сообщите администратору.';
+                        errorMessage = 'Пароль должен быть не менее 6 символов';
                         break;
                     default:
-                        errorMessage = error.message || 'Неизвестная ошибка';
+                        errorMessage = error.message;
                 }
-                
                 alert(errorMessage);
-                console.error('Ошибка регистрации:', error);
-                
             } finally {
-                // Разблокируем кнопку в любом случае
                 btn.disabled = false;
                 btn.textContent = 'Зарегистрироваться';
-            }
-        });
-
-        // Проверяем состояние аутентификации
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                // Если пользователь уже авторизован, перенаправляем
-                window.location.href = 'account.html';
             }
         });
     </script>
