@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | Типография Призма</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -362,7 +363,7 @@
                     <h2>Мои заказы</h2>
                     <div id="orders-list">
                         <!-- Заказы будут загружены динамически -->
-                        <div class="no-orders">У вас пока нет заказов</div>
+                        <div class="no-orders">Загрузка заказов...</div>
                     </div>
                 </div>
             </div>
@@ -417,72 +418,102 @@
             }
 
             // Загрузка данных профиля
-            const userDoc = await db.collection('clients').doc(user.uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                document.getElementById('user-name').textContent = `${userData.name} ${userData.surname}`;
-                document.getElementById('user-email').textContent = user.email;
-                document.getElementById('user-phone').textContent = userData.phone || 'Не указан';
-                document.getElementById('user-company').textContent = userData.company || 'Не указана';
-                
-                // Устанавливаем аватарку с инициалами
-                const initials = (userData.name ? userData.name.charAt(0) : '') + (userData.surname ? userData.surname.charAt(0) : '');
-                document.getElementById('user-avatar').textContent = initials || '?';
+            try {
+                const userDoc = await db.collection('clients').doc(user.uid).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    document.getElementById('user-name').textContent = `${userData.name || ''} ${userData.surname || ''}`.trim() || 'Имя не указано';
+                    document.getElementById('user-email').textContent = user.email || 'Email не указан';
+                    document.getElementById('user-phone').textContent = userData.phone || 'Телефон не указан';
+                    document.getElementById('user-company').textContent = userData.company || 'Компания не указана';
+                    
+                    // Устанавливаем аватарку с инициалами
+                    const initials = (userData.name ? userData.name.charAt(0) : '') + (userData.surname ? userData.surname.charAt(0) : '');
+                    document.getElementById('user-avatar').textContent = initials || '?';
+                } else {
+                    console.error("Профиль пользователя не найден в Firestore");
+                }
+            } catch (error) {
+                console.error("Ошибка при загрузке профиля:", error);
             }
 
             // Загрузка заказов пользователя
-            const ordersQuery = await db.collection('orders')
-                .where('userId', '==', user.uid)
-                .orderBy('createdAt', 'desc')
-                .get();
+            try {
+                const ordersQuery = await db.collection('orders')
+                    .where('clientId', '==', user.uid)
+                    .orderBy('date', 'desc')
+                    .get();
 
-            const ordersList = document.getElementById('orders-list');
-            
-            if (ordersQuery.empty) {
-                ordersList.innerHTML = '<div class="no-orders">У вас пока нет заказов</div>';
-            } else {
-                ordersList.innerHTML = '';
-                ordersQuery.forEach(doc => {
-                    const order = doc.data();
-                    const orderDate = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'Дата не указана';
-                    
-                    let statusClass = 'status-new';
-                    let statusText = 'Новый';
-                    
-                    if (order.status === 'in-progress') {
-                        statusClass = 'status-in-progress';
-                        statusText = 'В работе';
-                    } else if (order.status === 'completed') {
-                        statusClass = 'status-completed';
-                        statusText = 'Завершен';
-                    } else if (order.status === 'cancelled') {
-                        statusClass = 'status-cancelled';
-                        statusText = 'Отменен';
-                    }
-                    
-                    const orderElement = document.createElement('div');
-                    orderElement.className = 'order-item';
-                    orderElement.innerHTML = `
-                        <div class="order-header">
-                            <span>Заказ №${doc.id}</span>
-                            <span class="order-status ${statusClass}">${statusText}</span>
-                        </div>
-                        <div>${order.productName} (${order.quantity} шт.)</div>
-                        <div>Сумма: ${order.price.toFixed(2)} ₽</div>
-                        <div>Дата: ${orderDate}</div>
-                        <div class="order-details">
-                            <div class="order-detail">
-                                <strong>Материал</strong>
-                                <span>${order.materialName || 'Не указан'}</span>
+                const ordersList = document.getElementById('orders-list');
+                
+                if (ordersQuery.empty) {
+                    ordersList.innerHTML = '<div class="no-orders">У вас пока нет заказов</div>';
+                } else {
+                    ordersList.innerHTML = '';
+                    ordersQuery.forEach(doc => {
+                        const order = doc.data();
+                        const orderDate = order.date ? order.date.toDate().toLocaleDateString('ru-RU') : 'Дата не указана';
+                        
+                        let statusClass = 'status-new';
+                        let statusText = 'Новый';
+                        
+                        if (order.status === 'in-progress') {
+                            statusClass = 'status-in-progress';
+                            statusText = 'В работе';
+                        } else if (order.status === 'completed') {
+                            statusClass = 'status-completed';
+                            statusText = 'Завершен';
+                        } else if (order.status === 'cancelled') {
+                            statusClass = 'status-cancelled';
+                            statusText = 'Отменен';
+                        }
+                        
+                        // Формируем детали заказа
+                        const productTypeMap = {
+                            'visiting-card': 'Визитки',
+                            'sticker': 'Наклейки',
+                            'postcard': 'Открытки',
+                            'booklet': 'Буклеты',
+                            'magazine': 'Журналы',
+                            'box': 'Коробки',
+                            'calendar': 'Календари',
+                            'notebook': 'Блокноты'
+                        };
+                        
+                        const productType = productTypeMap[order.productType] || order.productType;
+                        const productDescription = `${productType}, ${order.quantity} шт.`;
+
+                        const orderElement = document.createElement('div');
+                        orderElement.className = 'order-item';
+                        orderElement.innerHTML = `
+                            <div class="order-header">
+                                <span>Заказ №${doc.id}</span>
+                                <span class="order-status ${statusClass}">${statusText}</span>
                             </div>
-                            <div class="order-detail">
-                                <strong>Статус</strong>
-                                <span>${statusText}</span>
+                            <div>${productDescription}</div>
+                            <div>Сумма: ${order.price?.toFixed(2) || '0.00'} ₽</div>
+                            <div>Дата: ${orderDate}</div>
+                            <div class="order-details">
+                                <div class="order-detail">
+                                    <strong>Тип продукта</strong>
+                                    <span>${productType}</span>
+                                </div>
+                                <div class="order-detail">
+                                    <strong>Статус</strong>
+                                    <span>${statusText}</span>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    ordersList.appendChild(orderElement);
-                });
+                        `;
+                        ordersList.appendChild(orderElement);
+                    });
+                }
+            } catch (error) {
+                console.error("Ошибка при загрузке заказов:", error);
+                document.getElementById('orders-list').innerHTML = `
+                    <div class="no-orders" style="color: var(--error)">
+                        Ошибка при загрузке заказов. Пожалуйста, попробуйте позже.
+                    </div>
+                `;
             }
         });
 
@@ -528,17 +559,17 @@
             const user = auth.currentUser;
             if (!user) return;
 
-            const userDoc = await db.collection('clients').doc(user.uid).get();
-            if (!userDoc.exists) return;
+            try {
+                const userDoc = await db.collection('clients').doc(user.uid).get();
+                if (!userDoc.exists) return;
 
-            const userData = userDoc.data();
-            const newName = prompt('Имя:', userData.name || '');
-            const newSurname = prompt('Фамилия:', userData.surname || '');
-            const newPhone = prompt('Телефон:', userData.phone || '');
-            const newCompany = prompt('Компания:', userData.company || '');
+                const userData = userDoc.data();
+                const newName = prompt('Имя:', userData.name || '');
+                const newSurname = prompt('Фамилия:', userData.surname || '');
+                const newPhone = prompt('Телефон:', userData.phone || '');
+                const newCompany = prompt('Компания:', userData.company || '');
 
-            if (newName !== null && newSurname !== null) {
-                try {
+                if (newName !== null && newSurname !== null) {
                     await db.collection('clients').doc(user.uid).update({
                         name: newName,
                         surname: newSurname,
@@ -547,9 +578,9 @@
                     });
                     alert('Профиль успешно обновлен!');
                     location.reload();
-                } catch (error) {
-                    alert('Ошибка при обновлении профиля: ' + error.message);
                 }
+            } catch (error) {
+                alert('Ошибка при обновлении профиля: ' + error.message);
             }
         });
 
