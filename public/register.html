@@ -392,7 +392,7 @@
         };
 
         // Инициализируем Firebase в совместимом режиме (compat)
-        firebase.initializeApp(firebaseConfig);
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
@@ -434,10 +434,7 @@
                 const user = userCredential.user;
                 
                 // 2. Отправка письма для подтверждения
-                await user.sendEmailVerification({
-                    url: window.location.origin + '/verify.html', // URL для перенаправления после подтверждения
-                    handleCodeInApp: true
-                });
+                await user.sendEmailVerification();
                 
                 // 3. Сохранение дополнительных данных в Firestore
                 await db.collection('clients').doc(user.uid).set({
@@ -472,6 +469,9 @@
                         break;
                     case 'auth/operation-not-allowed':
                         errorMessage = 'Регистрация по email/password отключена';
+                        break;
+                    case 'permission-denied':
+                        errorMessage = 'Недостаточно прав для выполнения операции. Пожалуйста, сообщите администратору.';
                         break;
                     default:
                         errorMessage = error.message || 'Неизвестная ошибка';
