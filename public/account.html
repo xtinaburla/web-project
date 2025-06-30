@@ -410,11 +410,10 @@
         </div>
     </footer>
 
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+   <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <script>
-        // Инициализация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -424,60 +423,40 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        // Инициализируем Firebase
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Проверка авторизации пользователя
-        auth.onAuthStateChanged((user) => {
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
-                // Пользователь не авторизован - перенаправляем на страницу входа
                 window.location.href = 'login.html';
-            } else if (!user.emailVerified) {
-                // Email не подтвержден - перенаправляем на страницу подтверждения
+                return;
+            }
+            
+            if (!user.emailVerified) {
                 window.location.href = 'verify.html';
-            } else {
-                // Пользователь авторизован и email подтвержден - загружаем данные
-                loadUserData(user.uid);
-                loadUserOrders(user.uid);
+                return;
             }
-        });
-
-        // Загрузка данных пользователя
-        async function loadUserData(userId) {
+            
             try {
-                const userDoc = await db.collection('clients').doc(userId).get();
-                if (userDoc.exists) {
-                    const userData = userDoc.data();
-                    // Здесь можно обновить интерфейс данными пользователя
-                    console.log('Данные пользователя:', userData);
+                // Загружаем профиль пользователя
+                const userDoc = await db.collection('clients').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await auth.signOut();
+                    window.location.href = 'login.html';
+                    return;
                 }
-            } catch (error) {
-                console.error('Ошибка загрузки данных пользователя:', error);
-            }
-        }
-
-        // Загрузка заказов пользователя
-        async function loadUserOrders(userId) {
-            try {
-                const ordersList = document.getElementById('orders-list');
                 
-                // Показываем индикатор загрузки
-                ordersList.innerHTML = `
-                    <div class="no-orders">
-                        <p>Загрузка ваших заказов...</p>
-                    </div>
-                `;
-
-                // Получаем заказы пользователя из Firestore
-                const querySnapshot = await db.collection('orders')
-                    .where('userId', '==', userId)
-                    .orderBy('createdAt', 'desc')
+                // Загружаем заказы
+                const ordersSnapshot = await db.collection('orders')
+                    .where('userId', '==', user.uid)
+                    .orderBy('date', 'desc')
                     .get();
-
-                // Проверяем есть ли заказы
-                if (querySnapshot.empty) {
+                
+                const ordersList = document.getElementById('orders-list');
+                ordersList.innerHTML = '';
+                
+                if (ordersSnapshot.empty) {
                     ordersList.innerHTML = `
                         <div class="no-orders">
                             <p>У вас пока нет заказов</p>
@@ -485,107 +464,41 @@
                     `;
                     return;
                 }
-
-                // Очищаем список перед добавлением новых элементов
-                ordersList.innerHTML = '';
-
-                // Перебираем все заказы и добавляем их в список
-                querySnapshot.forEach((doc) => {
+                
+                ordersSnapshot.forEach(doc => {
                     const order = doc.data();
-                    const orderDate = order.createdAt.toDate().toLocaleDateString('ru-RU', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric',
-                        hour: '2-digit',
-                        minute: '2-digit'
-                    });
+                    const orderDate = order.date.toDate().toLocaleDateString('ru-RU');
                     
-                    // Форматируем сумму заказа
-                    const orderPrice = order.price ? new Intl.NumberFormat('ru-RU', {
-                        style: 'currency',
-                        currency: 'RUB',
-                        minimumFractionDigits: 0
-                    }).format(order.price) : 'Цена не указана';
-
-                    // Создаем HTML для заказа
-                    const orderElement = `
+                    ordersList.innerHTML += `
                         <div class="order-item">
                             <div class="order-header">
                                 <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
                                 <span class="order-date">${orderDate}</span>
                             </div>
                             <div class="order-details">
-                                <p><strong>Тип:</strong> ${order.productType || 'Не указан'}</p>
-                                <p><strong>Статус:</strong> <span class="status-${order.status || 'processing'}">${getStatusText(order.status)}</span></p>
-                                <p><strong>Сумма:</strong> ${orderPrice}</p>
-                                ${order.comment ? `<p><strong>Комментарий:</strong> ${order.comment}</p>` : ''}
+                                <p><strong>Тип:</strong> ${order.productType === 'visiting-card' ? 'Визитки' : order.productType}</p>
+                                <p><strong>Статус:</strong> ${order.status === 'new' ? 'Новый' : order.status}</p>
+                                <p><strong>Сумма:</strong> ${order.price} ₽</p>
+                                <p><strong>Количество:</strong> ${order.quantity}</p>
                             </div>
                         </div>
                     `;
-
-                    // Добавляем заказ в список
-                    ordersList.innerHTML += orderElement;
                 });
-
+                
             } catch (error) {
-                console.error('Ошибка загрузки заказов:', error);
+                console.error('Ошибка загрузки:', error);
                 document.getElementById('orders-list').innerHTML = `
                     <div class="no-orders">
-                        <p>Произошла ошибка при загрузке заказов. Пожалуйста, попробуйте позже.</p>
+                        <p>Ошибка загрузки заказов</p>
                     </div>
                 `;
             }
-        }
+        });
 
-        // Функция для преобразования статуса заказа в читаемый текст
-        function getStatusText(status) {
-            const statusMap = {
-                'processing': 'В обработке',
-                'production': 'В производстве',
-                'completed': 'Завершен',
-                'shipped': 'Отправлен',
-                'cancelled': 'Отменен'
-            };
-            return statusMap[status] || status || 'В обработке';
-        }
-
-        // Выход из системы
         document.getElementById('logout-btn').addEventListener('click', () => {
             auth.signOut().then(() => {
                 window.location.href = 'login.html';
-            }).catch((error) => {
-                console.error('Ошибка при выходе:', error);
-                alert('Произошла ошибка при выходе из системы. Пожалуйста, попробуйте еще раз.');
             });
-        });
-
-        // Реализация real-time обновления заказов
-        function setupOrdersListener(userId) {
-            return db.collection('orders')
-                .where('userId', '==', userId)
-                .orderBy('createdAt', 'desc')
-                .onSnapshot((snapshot) => {
-                    // Обрабатываем изменения в реальном времени
-                    snapshot.docChanges().forEach((change) => {
-                        if (change.type === 'added' || change.type === 'modified') {
-                            // Обновляем интерфейс при добавлении/изменении заказов
-                            loadUserOrders(userId);
-                        }
-                    });
-                }, (error) => {
-                    console.error('Ошибка real-time обновления:', error);
-                });
-        }
-
-        // При загрузке страницы подписываемся на обновления
-        let unsubscribeOrders;
-        auth.onAuthStateChanged((user) => {
-            if (user) {
-                unsubscribeOrders = setupOrdersListener(user.uid);
-            } else if (unsubscribeOrders) {
-                // Отписываемся от обновлений при выходе
-                unsubscribeOrders();
-            }
         });
     </script>
 </body>
