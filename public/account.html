@@ -6,6 +6,7 @@
     <title>Личный кабинет | Типография Призма</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <style>
+        /* Все ваши стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -40,7 +41,6 @@
             padding: 0 20px;
         }
         
-        /* Шапка */
         header {
             background-color: var(--primary);
             padding: 15px 0;
@@ -108,7 +108,6 @@
             width: 100%;
         }
         
-        /* Герой-баннер */
         .hero-account {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.vuzopedia.ru/storage/app/uploads/public/5f6/234/043/5f62340436019282505345.jpg') center/cover;
             color: var(--light);
@@ -123,7 +122,6 @@
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
         
-        /* Секция аккаунта */
         .account-section {
             padding: 0 0 50px;
             flex: 1;
@@ -217,7 +215,6 @@
             font-size: 18px;
         }
         
-        /* Стили статусов */
         .status-new {
             color: var(--info);
             font-weight: 500;
@@ -248,7 +245,6 @@
             font-weight: 500;
         }
         
-        /* Футер */
         footer {
             background-color: var(--dark);
             color: var(--light);
@@ -310,7 +306,6 @@
             color: var(--secondary);
         }
         
-        /* Адаптивность */
         @media (max-width: 768px) {
             .header-content {
                 flex-direction: column;
@@ -374,6 +369,7 @@
             <div class="orders-container">
                 <h2>Мои заказы</h2>
                 <div id="orders-list">
+                    <!-- ТОЛЬКО ЭТОТ БЛОК БУДЕТ ОТОБРАЖАТЬСЯ ПРИ ОТСУТСТВИИ ЗАКАЗОВ -->
                     <div class="no-orders">
                         <p>Загрузка ваших заказов...</p>
                     </div>
@@ -490,6 +486,8 @@
             console.log('Текущий пользователь UID:', user.uid);
 
             const ordersList = document.getElementById('orders-list');
+            
+            // Показываем только сообщение о загрузке
             ordersList.innerHTML = '<div class="no-orders"><p>Загрузка ваших заказов...</p></div>';
 
             try {
@@ -500,24 +498,18 @@
 
                 const ordersSnapshot = await ordersQuery.get();
                 
-                // Полностью очищаем список перед загрузкой новых данных
+                // Полностью очищаем список
                 ordersList.innerHTML = '';
 
                 console.log('Найдено заказов:', ordersSnapshot.size);
 
                 if (ordersSnapshot.empty) {
-                    ordersList.innerHTML = `
-                        <div class="no-orders">
-                            <p>У вас пока нет заказов</p>
-                        </div>
-                    `;
+                    // ТОЛЬКО ЭТО СООБЩЕНИЕ БУДЕТ ПОКАЗАНО, ЕСЛИ ЗАКАЗОВ НЕТ
+                    ordersList.innerHTML = '<div class="no-orders"><p>У вас пока нет заказов</p></div>';
                     return;
                 }
 
-                // Создаем фрагмент документа для оптимизации
-                const fragment = document.createDocumentFragment();
-
-                // Отображение заказов
+                // Добавляем только реальные заказы из Firebase
                 ordersSnapshot.forEach(doc => {
                     const order = doc.data();
                     console.log('Заказ из БД:', doc.id, order);
@@ -536,13 +528,11 @@
                             <p><strong>Количество:</strong> ${order.quantity || '1'}</p>
                         </div>
                     `;
-                    fragment.appendChild(orderItem);
+                    ordersList.appendChild(orderItem);
                 });
 
-                ordersList.appendChild(fragment);
-
             } catch (error) {
-                console.error('Полная ошибка:', error);
+                console.error('Ошибка загрузки заказов:', error);
                 ordersList.innerHTML = `
                     <div class="no-orders">
                         <p>Ошибка загрузки заказов</p>
