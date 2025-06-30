@@ -6,9 +6,9 @@
     <title>Вход | Типография Призма</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <style>
         :root {
             --primary: #239439;
@@ -175,10 +175,16 @@
             border-radius: 4px;
             cursor: pointer;
             width: 100%;
+            transition: background-color 0.3s;
         }
         
         .btn:hover {
             background-color: var(--primary-dark);
+        }
+        
+        .btn:disabled {
+            background-color: var(--secondary);
+            cursor: not-allowed;
         }
         
         .btn-link {
@@ -187,6 +193,9 @@
             text-decoration: underline;
             padding: 0;
             width: auto;
+            border: none;
+            cursor: pointer;
+            font-size: inherit;
         }
         
         .text-center {
@@ -195,6 +204,13 @@
         
         .mt-3 {
             margin-top: 15px;
+        }
+        
+        .error-message {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
         }
         
         footer {
@@ -253,10 +269,11 @@
                         <div class="form-group">
                             <label for="login-password">Пароль</label>
                             <input type="password" class="form-control" id="login-password" required>
+                            <div class="error-message" id="login-error"></div>
                         </div>
-                        <button type="submit" class="btn">Войти</button>
+                        <button type="submit" class="btn" id="login-btn">Войти</button>
                         <div class="text-center mt-3">
-                            <a href="register.html" class="btn-link">Нет аккаунта? Зарегистрируйтесь</a>
+                            <button type="button" class="btn-link" onclick="window.location.href='register.html'">Нет аккаунта? Зарегистрируйтесь</button>
                         </div>
                     </form>
                 </div>
@@ -300,6 +317,7 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
+        // Инициализируем Firebase в совместимом режиме
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
@@ -310,27 +328,69 @@
             
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const loginBtn = document.getElementById('login-btn');
+            const errorElement = document.getElementById('login-error');
+            
+            // Скрываем предыдущие ошибки
+            errorElement.style.display = 'none';
+            
+            // Блокируем кнопку входа
+            loginBtn.disabled = true;
+            loginBtn.textContent = 'Вход...';
             
             try {
+                // Пытаемся войти с помощью email и пароля
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                if (user && !user.emailVerified) {
-                    alert('Пожалуйста, подтвердите ваш email перед входом.');
+                // Проверяем, подтвержден ли email
+                if (!user.emailVerified) {
                     await auth.signOut();
-                    return;
+                    throw new Error('Пожалуйста, подтвердите ваш email перед входом. Проверьте вашу почту (включая папку "Спам").');
                 }
                 
                 // Перенаправление в личный кабинет после успешного входа
                 window.location.href = 'account.html';
+                
             } catch (error) {
-                alert('Ошибка входа: ' + error.message);
+                // Обрабатываем ошибки входа
+                let errorMessage = 'Ошибка входа';
+                
+                switch(error.code) {
+                    case 'auth/invalid-email':
+                        errorMessage = 'Некорректный email адрес';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'Аккаунт заблокирован';
+                        break;
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Неверный email или пароль';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Слишком много попыток входа. Попробуйте позже.';
+                        break;
+                    default:
+                        errorMessage = error.message || 'Произошла ошибка при входе';
+                }
+                
+                // Показываем сообщение об ошибке
+                errorElement.textContent = errorMessage;
+                errorElement.style.display = 'block';
+                
+                console.error('Ошибка входа:', error);
+                
+            } finally {
+                // Разблокируем кнопку входа
+                loginBtn.disabled = false;
+                loginBtn.textContent = 'Войти';
             }
         });
 
         // Проверка состояния аутентификации
         auth.onAuthStateChanged((user) => {
             if (user && user.emailVerified) {
+                // Если пользователь уже авторизован и email подтвержден, перенаправляем в личный кабинет
                 window.location.href = 'account.html';
             }
         });
