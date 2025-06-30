@@ -291,7 +291,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
-    <script>
+<script>
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -301,18 +301,37 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        firebase.initializeApp(firebaseConfig);
+        // Инициализация Firebase
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
+        
+        // Проверка на уже инициализированное приложение
+        if (firebase.apps.length > 1) {
+            firebase.app().delete();
+        }
+
         const statusMessage = document.getElementById('status-message');
 
         // Обработка формы входа
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('login-email').value.trim();
+            const password = document.getElementById('login-password').value.trim();
             const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            // Валидация email
+            if (!email || !email.includes('@')) {
+                showStatus('Пожалуйста, введите корректный email', 'error');
+                return;
+            }
+            
+            // Валидация пароля
+            if (!password || password.length < 6) {
+                showStatus('Пароль должен содержать не менее 6 символов', 'error');
+                return;
+            }
             
             submitBtn.disabled = true;
             submitBtn.textContent = 'Вход...';
@@ -321,31 +340,46 @@
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Проверяем, подтвержден ли email
                 if (!user.emailVerified) {
+                    // Если email не подтвержден, предлагаем отправить письмо повторно
+                    if (confirm('Ваш email не подтвержден. Отправить письмо подтверждения снова?')) {
+                        await user.sendEmailVerification({
+                            url: window.location.origin + '/verify.html'
+                        });
+                        showStatus('Письмо отправлено! Пожалуйста, подтвердите email.', 'success');
+                    }
                     await auth.signOut();
-                    throw new Error('Ваш email не подтвержден. Пожалуйста, проверьте почту и подтвердите email перед входом.');
+                    return;
                 }
                 
                 // Проверяем наличие профиля пользователя в Firestore
                 const userDoc = await db.collection('clients').doc(user.uid).get();
                 if (!userDoc.exists) {
                     await auth.signOut();
-                    throw new Error('Профиль пользователя не найден');
+                    throw new Error('Профиль пользователя не найден. Пожалуйста, зарегистрируйтесь.');
                 }
                 
                 // Успешный вход
                 window.location.href = 'account.html';
                 
             } catch (error) {
+                console.error('Ошибка входа:', error);
                 let errorMessage = 'Ошибка входа';
                 switch(error.code) {
                     case 'auth/user-not-found':
+                        errorMessage = 'Пользователь с таким email не найден';
+                        break;
                     case 'auth/wrong-password':
-                        errorMessage = 'Неверный email или пароль';
+                        errorMessage = 'Неверный пароль';
                         break;
                     case 'auth/too-many-requests':
-                        errorMessage = 'Слишком много попыток. Попробуйте позже';
+                        errorMessage = 'Слишком много попыток. Попробуйте позже или сбросьте пароль';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Некорректный email';
+                        break;
+                    case 'auth/user-disabled':
+                        errorMessage = 'Аккаунт отключен';
                         break;
                     default:
                         errorMessage = error.message || 'Произошла ошибка при входе';
@@ -357,27 +391,29 @@
             }
         });
 
-        // Проверка состояния аутентификации (для уже авторизованных пользователей)
+        // Проверка состояния аутентификации
         auth.onAuthStateChanged(async (user) => {
-            if (user) {
-                // Проверяем, подтвержден ли email
-                if (user.emailVerified) {
-                    // Проверяем наличие профиля в Firestore
+            if (user && user.emailVerified) {
+                try {
                     const userDoc = await db.collection('clients').doc(user.uid).get();
                     if (userDoc.exists) {
                         window.location.href = 'account.html';
                     }
-                } else {
-                    showStatus('Ваш email не подтвержден. Пожалуйста, проверьте почту.', 'error');
+                } catch (error) {
+                    console.error('Ошибка проверки профиля:', error);
                 }
             }
         });
 
-        // Функция для отображения статусных сообщений
         function showStatus(message, type) {
             statusMessage.textContent = message;
             statusMessage.className = 'status-message status-' + type;
             statusMessage.style.display = 'block';
+            
+            // Автоматическое скрытие сообщения через 5 секунд
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
         }
     </script>
 </body>
