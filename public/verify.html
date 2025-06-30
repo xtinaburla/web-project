@@ -330,6 +330,7 @@
 
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
@@ -342,8 +343,8 @@
 
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
+        const db = firebase.firestore();
 
-        // Повторная отправка письма подтверждения
         document.getElementById('resend-email').addEventListener('click', async (e) => {
             e.preventDefault();
             const user = auth.currentUser;
@@ -351,21 +352,18 @@
             if (user) {
                 try {
                     await user.sendEmailVerification();
-                    alert('Письмо с подтверждением отправлено повторно! Проверьте вашу почту.');
+                    alert('Письмо отправлено повторно! Проверьте почту.');
                 } catch (error) {
                     alert('Ошибка: ' + error.message);
                 }
             } else {
-                alert('Пользователь не найден. Пожалуйста, зарегистрируйтесь снова.');
                 window.location.href = 'register.html';
             }
         });
 
-        // Проверка, подтвержден ли email
         auth.onAuthStateChanged(user => {
             if (user && user.emailVerified) {
-                // Обновляем статус в Firestore
-                firebase.firestore().collection('clients').doc(user.uid).update({
+                db.collection('clients').doc(user.uid).update({
                     emailVerified: true
                 }).then(() => {
                     window.location.href = 'account.html';
@@ -373,30 +371,5 @@
             }
         });
     </script>
-    <!-- Футер -->
-    <footer>
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-column">
-                    <h3>Контакты</h3>
-                    <ul>
-                        <li>г. Иркутск, ул. Рабочего Штаба, 78/5</li>
-                        <li>+7 (395) 248-22-02</li>
-                        <li>prisma-irk@mail.ru</li>
-                    </ul>
-                </div>
-                <div class="footer-column">
-                    <h3>Компания</h3>
-                    <ul>
-                        <li><a href="mission.html">Наша миссия</a></li>
-			<li><a href="payment.html">Оплата</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="copyright">
-                <p>&copy; 2025 ООО"Типография Призма". Все права защищены.</p>
-            </div>
-        </div>
-    </footer>
 </body>
 </html>
