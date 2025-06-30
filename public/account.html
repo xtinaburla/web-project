@@ -427,112 +427,85 @@
     const auth = firebase.auth();
     const db = firebase.firestore();
 
-    // Функция для форматирования даты
-    function formatDate(date) {
-        const options = { 
-            year: 'numeric', 
-            month: 'long', 
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        };
-        return date.toLocaleDateString('ru-RU', options);
-    }
+    // Функции для форматирования данных
+    const formatDate = (date) => new Date(date).toLocaleDateString('ru-RU', {
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
 
-    // Функция для преобразования типа продукта в читаемое название
-    function getProductName(type) {
-        const names = {
-            'visiting-card': 'Визитки',
-            'sticker': 'Наклейки',
-            'postcard': 'Открытки',
-            'booklet': 'Буклеты',
-            'magazine': 'Журналы',
-            'box': 'Коробки',
-            'calendar': 'Календари',
-            'notebook': 'Блокноты'
-        };
-        return names[type] || type;
-    }
+    const getProductName = (type) => ({
+        'visiting-card': 'Визитки',
+        'sticker': 'Наклейки',
+        'postcard': 'Открытки',
+        'booklet': 'Буклеты',
+        'magazine': 'Журналы',
+        'box': 'Коробки',
+        'calendar': 'Календари',
+        'notebook': 'Блокноты'
+    })[type] || type;
 
-    // Функция для преобразования статуса
-    function getStatusName(status) {
-        const statuses = {
-            'new': 'Новый',
-            'processing': 'В обработке',
-            'production': 'В производстве',
-            'completed': 'Завершен',
-            'shipped': 'Отправлен',
-            'cancelled': 'Отменен'
-        };
-        return statuses[status] || status;
-    }
+    const getStatusName = (status) => ({
+        'new': 'Новый',
+        'processing': 'В обработке',
+        'production': 'В производстве',
+        'completed': 'Завершен',
+        'shipped': 'Отправлен',
+        'cancelled': 'Отменен'
+    })[status] || status;
 
+    // Загрузка данных
     auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-        
-        if (!user.emailVerified) {
-            window.location.href = 'verify.html';
-            return;
-        }
-        
+        if (!user) return window.location.href = 'login.html';
+        if (!user.emailVerified) return window.location.href = 'verify.html';
+
         try {
-            // Загружаем заказы пользователя
-            const ordersQuery = db.collection('orders')
+            // Загрузка заказов пользователя
+            const snapshot = await db.collection('orders')
                 .where('userId', '==', user.uid)
-                .orderBy('date', 'desc');
-            
-            const ordersSnapshot = await ordersQuery.get();
+                .orderBy('date', 'desc')
+                .get();
+
             const ordersList = document.getElementById('orders-list');
-            ordersList.innerHTML = '';
-            
-            if (ordersSnapshot.empty) {
-                ordersList.innerHTML = `
-                    <div class="no-orders">
-                        <p>У вас пока нет заказов</p>
-                    </div>
-                `;
-                return;
-            }
-            
-            // Создаем элементы заказов
-            ordersSnapshot.forEach(doc => {
+            ordersList.innerHTML = snapshot.empty ? `
+                <div class="no-orders">
+                    <p>У вас пока нет заказов</p>
+                </div>
+            ` : '';
+
+            snapshot.forEach(doc => {
                 const order = doc.data();
-                const orderDate = order.date ? formatDate(order.date.toDate()) : 'Дата не указана';
-                const productName = order.productName || getProductName(order.productType);
-                const statusName = getStatusName(order.status);
-                
                 ordersList.innerHTML += `
                     <div class="order-item">
                         <div class="order-header">
                             <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
-                            <span class="order-date">${orderDate}</span>
+                            <span class="order-date">${formatDate(order.date?.toDate())}</span>
                         </div>
                         <div class="order-details">
-                            <p><strong>Тип:</strong> ${productName}</p>
-                            <p><strong>Статус:</strong> <span class="status-${order.status}">${statusName}</span></p>
-                            <p><strong>Сумма:</strong> ${order.price || 0} ₽</p>
-                            <p><strong>Количество:</strong> ${order.quantity || 1}</p>
+                            <p><strong>Тип:</strong> ${getProductName(order.productType)}</p>
+                            <p><strong>Статус:</strong> <span class="status-${order.status}">${getStatusName(order.status)}</span></p>
+                            <p><strong>Сумма:</strong> ${order.price?.toFixed(2) || '0.00'} ₽</p>
+                            <p><strong>Количество:</strong> ${order.quantity || '1'}</p>
                         </div>
                     </div>
                 `;
             });
-            
+
         } catch (error) {
-            console.error('Ошибка загрузки заказов:', error);
+            console.error('Ошибка загрузки:', error);
             document.getElementById('orders-list').innerHTML = `
                 <div class="no-orders">
-                    <p>Ошибка загрузки заказов. Пожалуйста, попробуйте позже.</p>
+                    <p>Ошибка загрузки заказов</p>
+                    <p>${error.message}</p>
                 </div>
             `;
         }
     });
 
+    // Выход из системы
     document.getElementById('logout-btn').addEventListener('click', () => {
-        auth.signOut().then(() => {
-            window.location.href = 'login.html';
-        });
+        auth.signOut().then(() => window.location.href = 'login.html');
     });
 </script>
