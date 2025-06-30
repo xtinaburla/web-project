@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация | Типография Призма</title>
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -176,6 +177,26 @@
             margin-top: 5px;
             display: none;
         }
+        
+        .status-message {
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            text-align: center;
+            display: none;
+        }
+        
+        .status-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
     </style>
 </head>
 <body>
@@ -205,6 +226,7 @@
         <div class="container">
             <div class="account-container">
                 <div class="auth-form">
+                    <div id="status-message" class="status-message"></div>
                     <h2>Создать аккаунт</h2>
                     <form id="registerForm">
                         <div class="form-group">
@@ -292,6 +314,8 @@
             firebase.app().delete();
         }
 
+        const statusMessage = document.getElementById('status-message');
+
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
@@ -303,12 +327,12 @@
             
             // Валидация данных
             if (!email || !email.includes('@')) {
-                alert('Пожалуйста, введите корректный email');
+                showStatus('Пожалуйста, введите корректный email', 'error');
                 return;
             }
             
             if (password.length < 6) {
-                alert('Пароль должен содержать не менее 6 символов');
+                showStatus('Пароль должен содержать не менее 6 символов', 'error');
                 return;
             }
             
@@ -320,7 +344,7 @@
             }
             
             if (!phone) {
-                alert('Пожалуйста, укажите телефон');
+                showStatus('Пожалуйста, укажите телефон', 'error');
                 return;
             }
 
@@ -348,11 +372,11 @@
                 
                 // 3. Отправляем письмо подтверждения
                 await user.sendEmailVerification({
-                    url: window.location.origin + '/verify.html'
+                    url: window.location.origin + '/login.html'
                 });
                 
-                // 4. Показываем сообщение об успехе
-                alert('Регистрация успешна! На ваш email отправлено письмо для подтверждения. Пожалуйста, проверьте почту (включая папку "Спам").');
+                // 4. Выходим из системы, пока email не подтвержден
+                await auth.signOut();
                 
                 // 5. Перенаправляем на страницу подтверждения
                 window.location.href = 'verify.html';
@@ -376,7 +400,7 @@
                     default:
                         errorMessage = error.message || 'Произошла ошибка при регистрации';
                 }
-                alert(errorMessage);
+                showStatus(errorMessage, 'error');
             } finally {
                 btn.disabled = false;
                 btn.textContent = 'Зарегистрироваться';
@@ -387,6 +411,17 @@
         document.getElementById('reg-phone').addEventListener('input', function(e) {
             this.value = this.value.replace(/[^0-9+()-]/g, '');
         });
+
+        function showStatus(message, type) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status-message status-' + type;
+            statusMessage.style.display = 'block';
+            
+            // Автоматическое скрытие сообщения через 5 секунд
+            setTimeout(() => {
+                statusMessage.style.display = 'none';
+            }, 5000);
+        }
     </script>
 </body>
 </html>
