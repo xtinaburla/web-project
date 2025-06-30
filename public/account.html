@@ -430,34 +430,31 @@
         };
 
         // Инициализация Firebase
-        firebase.initializeApp(firebaseConfig);
+        const app = firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
         // Функция для форматирования даты
-        function formatDate(timestamp) {
-            if (!timestamp || !timestamp.toDate) {
-                return 'Дата не указана';
-            }
+        const formatDate = (timestamp) => {
+            if (!timestamp || !timestamp.toDate) return 'Дата не указана';
             try {
                 const date = timestamp.toDate();
-                const options = {
-                    year: 'numeric',
-                    month: 'long',
+                return date.toLocaleDateString('ru-RU', {
+                    year: 'numeric', 
+                    month: 'long', 
                     day: 'numeric',
                     hour: '2-digit',
                     minute: '2-digit'
-                };
-                return date.toLocaleDateString('ru-RU', options);
-            } catch (error) {
-                console.error('Ошибка при форматировании даты:', error);
+                });
+            } catch (e) {
+                console.error("Ошибка форматирования даты:", e);
                 return 'Неверный формат даты';
             }
-        }
+        };
 
         // Функция для получения названия продукта
-        function getProductName(productType) {
-            const productNames = {
+        const getProductName = (type) => {
+            const names = {
                 'visiting-card': 'Визитки',
                 'sticker': 'Наклейки',
                 'postcard': 'Открытки',
@@ -467,12 +464,12 @@
                 'calendar': 'Календари',
                 'notebook': 'Блокноты'
             };
-            return productNames[productType] || productType;
-        }
+            return names[type] || type;
+        };
 
-        // Функция для получения названия статуса
-        function getStatusName(status) {
-            const statusNames = {
+        // Функция для получения статуса заказа
+        const getStatusName = (status) => {
+            const statuses = {
                 'new': 'Новый',
                 'processing': 'В обработке',
                 'production': 'В производстве',
@@ -480,82 +477,89 @@
                 'shipped': 'Отправлен',
                 'cancelled': 'Отменен'
             };
-            return statusNames[status] || status;
-        }
+            return statuses[status] || status;
+        };
 
         // Основная функция загрузки данных
-        auth.onAuthStateChanged(function(user) {
+        auth.onAuthStateChanged(async (user) => {
             if (!user) {
                 window.location.href = 'login.html';
                 return;
             }
 
-            console.log('Пользователь авторизован с UID:', user.uid);
+            console.log('Текущий пользователь UID:', user.uid);
 
             const ordersList = document.getElementById('orders-list');
-            
-            // Показываем сообщение о загрузке
             ordersList.innerHTML = '<div class="no-orders"><p>Загрузка ваших заказов...</p></div>';
 
-            // Запрос заказов пользователя
-            db.collection('orders')
-                .where('userId', '==', user.uid)
-                .orderBy('date', 'desc')
-                .get()
-                .then(function(querySnapshot) {
-                    console.log('Найдено заказов:', querySnapshot.size);
-                    
-                    // Очищаем список перед добавлением новых элементов
-                    ordersList.innerHTML = '';
+            try {
+                // Загрузка заказов пользователя
+                const ordersQuery = db.collection('orders')
+                    .where('userId', '==', user.uid)
+                    .orderBy('date', 'desc');
 
-                    if (querySnapshot.empty) {
-                        ordersList.innerHTML = '<div class="no-orders"><p>У вас пока нет заказов</p></div>';
-                        return;
-                    }
+                const ordersSnapshot = await ordersQuery.get();
+                
+                // Полностью очищаем список перед загрузкой новых данных
+                ordersList.innerHTML = '';
 
-                    // Добавляем каждый заказ в список
-                    querySnapshot.forEach(function(doc) {
-                        const orderData = doc.data();
-                        console.log('Заказ:', doc.id, orderData);
+                console.log('Найдено заказов:', ordersSnapshot.size);
 
-                        const orderItem = document.createElement('div');
-                        orderItem.className = 'order-item';
-                        
-                        orderItem.innerHTML = `
-                            <div class="order-header">
-                                <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
-                                <span class="order-date">${formatDate(orderData.date)}</span>
-                            </div>
-                            <div class="order-details">
-                                <p><strong>Тип:</strong> ${orderData.productName || getProductName(orderData.productType)}</p>
-                                <p><strong>Статус:</strong> <span class="status-${orderData.status}">${getStatusName(orderData.status)}</span></p>
-                                <p><strong>Сумма:</strong> ${orderData.price ? orderData.price.toFixed(2) : '0.00'} ₽</p>
-                                <p><strong>Количество:</strong> ${orderData.quantity || '1'}</p>
-                            </div>
-                        `;
-                        
-                        ordersList.appendChild(orderItem);
-                    });
-                })
-                .catch(function(error) {
-                    console.error('Ошибка при загрузке заказов:', error);
+                if (ordersSnapshot.empty) {
                     ordersList.innerHTML = `
                         <div class="no-orders">
-                            <p>Произошла ошибка при загрузке заказов</p>
-                            <p>Пожалуйста, попробуйте позже</p>
+                            <p>У вас пока нет заказов</p>
                         </div>
                     `;
+                    return;
+                }
+
+                // Создаем фрагмент документа для оптимизации
+                const fragment = document.createDocumentFragment();
+
+                // Отображение заказов
+                ordersSnapshot.forEach(doc => {
+                    const order = doc.data();
+                    console.log('Заказ из БД:', doc.id, order);
+
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    orderItem.innerHTML = `
+                        <div class="order-header">
+                            <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
+                            <span class="order-date">${formatDate(order.date)}</span>
+                        </div>
+                        <div class="order-details">
+                            <p><strong>Тип:</strong> ${order.productName || getProductName(order.productType)}</p>
+                            <p><strong>Статус:</strong> <span class="status-${order.status}">${getStatusName(order.status)}</span></p>
+                            <p><strong>Сумма:</strong> ${order.price?.toFixed(2) || '0.00'} ₽</p>
+                            <p><strong>Количество:</strong> ${order.quantity || '1'}</p>
+                        </div>
+                    `;
+                    fragment.appendChild(orderItem);
                 });
+
+                ordersList.appendChild(fragment);
+
+            } catch (error) {
+                console.error('Полная ошибка:', error);
+                ordersList.innerHTML = `
+                    <div class="no-orders">
+                        <p>Ошибка загрузки заказов</p>
+                        <p>Пожалуйста, попробуйте позже</p>
+                    </div>
+                `;
+            }
         });
 
-        // Обработчик кнопки выхода
-        document.getElementById('logout-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            auth.signOut().then(function() {
+        // Выход из системы
+        document.getElementById('logout-btn').addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
                 window.location.href = 'login.html';
-            }).catch(function(error) {
-                console.error('Ошибка при выходе из системы:', error);
-                alert('Не удалось выйти из системы. Пожалуйста, попробуйте снова.');
+            }).catch(error => {
+                console.error('Ошибка при выходе:', error);
+                alert('Не удалось выйти из системы');
             });
         });
     </script>
