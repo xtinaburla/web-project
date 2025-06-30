@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Личный кабинет | Типография Призма</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <style>
-        /* Все ваши стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -14,9 +12,6 @@
             --light: #FFFFFF;
             --gray: #F5F5F5;
             --error: #dc3545;
-            --warning: #ffc107;
-            --success: #28a745;
-            --info: #17a2b8;
         }
         
         * {
@@ -30,9 +25,6 @@
             color: var(--dark);
             line-height: 1.6;
             background-color: var(--gray);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
         
         .container {
@@ -45,9 +37,6 @@
             background-color: var(--primary);
             padding: 15px 0;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 100;
         }
         
         .header-content {
@@ -64,13 +53,11 @@
         
         .logo img {
             height: 50px;
-            width: auto;
         }
         
         .logo h1 {
             color: var(--light);
             font-size: 24px;
-            font-weight: 700;
         }
         
         nav ul {
@@ -85,27 +72,10 @@
             font-weight: 500;
             transition: opacity 0.3s;
             font-size: 18px;
-            padding: 5px 0;
-            position: relative;
         }
         
         nav ul li a:hover {
             opacity: 0.8;
-        }
-        
-        nav ul li a::after {
-            content: '';
-            position: absolute;
-            width: 0;
-            height: 2px;
-            background-color: var(--light);
-            bottom: 0;
-            left: 0;
-            transition: width 0.3s;
-        }
-        
-        nav ul li a:hover::after {
-            width: 100%;
         }
         
         .hero-account {
@@ -113,148 +83,184 @@
             color: var(--light);
             padding: 60px 0;
             text-align: center;
-            margin-bottom: 40px;
         }
         
         .hero-account h1 {
             font-size: 36px;
-            font-weight: 700;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
         }
         
         .account-section {
-            padding: 0 0 50px;
-            flex: 1;
+            padding: 50px 0;
         }
         
-        .orders-container {
+        .account-container {
+            max-width: 1000px;
+            margin: 0 auto;
             background: var(--light);
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             padding: 30px;
-            margin-bottom: 30px;
+        }
+        
+        .account-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .user-details {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .user-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--light);
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        .user-details h2 {
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+        
+        .user-details p {
+            margin-bottom: 10px;
+        }
+        
+        .account-actions {
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .account-actions h3 {
+            color: var(--primary);
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: var(--light);
+            padding: 12px 25px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        
+        .btn:hover {
+            background-color: #1c7a2e;
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+        }
+        
+        .btn-danger {
+            background-color: var(--error);
+        }
+        
+        .orders-container {
+            margin-top: 30px;
         }
         
         .orders-container h2 {
             color: var(--primary);
-            margin-bottom: 25px;
-            font-size: 28px;
+            margin-bottom: 20px;
+            font-size: 24px;
             text-align: center;
-            position: relative;
-            padding-bottom: 15px;
-        }
-        
-        .orders-container h2::after {
-            content: '';
-            position: absolute;
-            width: 100px;
-            height: 3px;
-            background-color: var(--secondary);
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
         }
         
         .order-item {
             border: 1px solid #eee;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
             transition: all 0.3s;
-            background-color: var(--light);
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
         }
         
         .order-item:hover {
-            transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            border-color: var(--primary);
         }
         
         .order-header {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             font-weight: 500;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
         }
         
-        .order-number {
-            color: var(--primary);
-            font-weight: 600;
-        }
-        
-        .order-date {
-            color: #666;
+        .order-status {
+            padding: 5px 10px;
+            border-radius: 4px;
             font-size: 14px;
+        }
+        
+        .status-new {
+            background-color: #d4edff;
+            color: #004085;
+        }
+        
+        .status-in-progress {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .status-completed {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-cancelled {
+            background-color: #f8d7da;
+            color: #721c24;
         }
         
         .order-details {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
             gap: 15px;
+            margin-top: 15px;
         }
         
-        .order-details p {
-            margin-bottom: 0;
+        .order-detail {
+            margin-bottom: 5px;
         }
         
-        .order-details strong {
-            color: var(--dark);
-            font-weight: 500;
+        .order-detail strong {
+            display: block;
+            color: var(--primary);
+            margin-bottom: 3px;
         }
         
         .no-orders {
             text-align: center;
-            padding: 40px 20px;
+            padding: 40px;
             color: #666;
-        }
-        
-        .no-orders p {
-            font-size: 18px;
-        }
-        
-        .status-new {
-            color: var(--info);
-            font-weight: 500;
-        }
-        
-        .status-processing {
-            color: var(--info);
-            font-weight: 500;
-        }
-        
-        .status-production {
-            color: var(--warning);
-            font-weight: 500;
-        }
-        
-        .status-completed {
-            color: var(--success);
-            font-weight: 500;
-        }
-        
-        .status-shipped {
-            color: var(--primary);
-            font-weight: 500;
-        }
-        
-        .status-cancelled {
-            color: var(--error);
-            font-weight: 500;
         }
         
         footer {
             background-color: var(--dark);
             color: var(--light);
-            padding: 40px 0 20px;
-            margin-top: auto;
+            padding: 30px 0 20px;
+            margin-top: 50px;
         }
         
         .footer-content {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: 1fr 1fr;
             gap: 30px;
             margin-bottom: 30px;
         }
@@ -263,18 +269,6 @@
             font-size: 20px;
             margin-bottom: 20px;
             color: var(--secondary);
-            position: relative;
-            padding-bottom: 10px;
-        }
-        
-        .footer-column h3::after {
-            content: '';
-            position: absolute;
-            width: 50px;
-            height: 2px;
-            background-color: var(--primary);
-            bottom: 0;
-            left: 0;
         }
         
         .footer-column ul {
@@ -289,21 +283,16 @@
             color: var(--light);
             text-decoration: none;
             transition: color 0.3s;
-            display: inline-block;
-            padding: 3px 0;
         }
         
         .footer-column ul li a:hover {
             color: var(--secondary);
-            transform: translateX(5px);
         }
         
         .copyright {
             text-align: center;
             padding-top: 20px;
             border-top: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
-            color: var(--secondary);
         }
         
         @media (max-width: 768px) {
@@ -314,29 +303,14 @@
             
             nav ul {
                 gap: 15px;
-                flex-wrap: wrap;
-                justify-content: center;
             }
             
-            .hero-account {
-                padding: 40px 0;
-            }
-            
-            .hero-account h1 {
-                font-size: 28px;
-            }
-            
-            .orders-container {
-                padding: 20px;
-            }
-            
-            .order-details {
+            .footer-content {
                 grid-template-columns: 1fr;
             }
             
-            .order-header {
-                flex-direction: column;
-                gap: 5px;
+            .account-container {
+                padding: 20px;
             }
         }
     </style>
@@ -352,7 +326,7 @@
                 <ul>
                     <li><a href="index.html">Главная</a></li>
                     <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="#" id="logout-btn">Выйти</a></li>
+                    <li><a href="#" id="logout-link">Выйти</a></li>
                 </ul>
             </nav>
         </div>
@@ -366,12 +340,29 @@
 
     <section class="account-section">
         <div class="container">
-            <div class="orders-container">
-                <h2>Мои заказы</h2>
-                <div id="orders-list">
-                    <!-- ТОЛЬКО ЭТОТ БЛОК БУДЕТ ОТОБРАЖАТЬСЯ ПРИ ОТСУТСТВИИ ЗАКАЗОВ -->
-                    <div class="no-orders">
-                        <p>Загрузка ваших заказов...</p>
+            <div class="account-container">
+                <div class="account-info">
+                    <div class="user-details">
+                        <div class="user-avatar" id="user-avatar">JD</div>
+                        <h2 id="user-name">Иван Иванов</h2>
+                        <p id="user-email">example@email.com</p>
+                        <p id="user-phone">+7 (123) 456-78-90</p>
+                        <p id="user-company">ООО "Компания"</p>
+                    </div>
+                    <div class="account-actions">
+                        <h3>Действия</h3>
+                        <a href="index.html#calculator" class="btn">Создать новый заказ</a>
+                        <button id="change-password-btn" class="btn btn-secondary">Изменить пароль</button>
+                        <button id="edit-profile-btn" class="btn btn-secondary">Редактировать профиль</button>
+                        <button id="delete-account-btn" class="btn btn-danger">Удалить аккаунт</button>
+                    </div>
+                </div>
+                
+                <div class="orders-container">
+                    <h2>Мои заказы</h2>
+                    <div id="orders-list">
+                        <!-- Заказы будут загружены динамически -->
+                        <div class="no-orders">У вас пока нет заказов</div>
                     </div>
                 </div>
             </div>
@@ -383,176 +374,214 @@
             <div class="footer-column">
                 <h3>Контакты</h3>
                 <ul>
-                    <li>г. Москва, ул. Примерная, 123</li>
-                    <li>Телефон: +7 (123) 456-78-90</li>
-                    <li>Email: info@prisma-print.ru</li>
+                    <li>г. Иркутск, ул. Рабочего Штаба, 78/5</li>
+                    <li>Телефон: +7 (395) 248-22-02</li>
+                    <li>Email: prisma-irk@mail.ru</li>
                 </ul>
             </div>
             <div class="footer-column">
-                <h3>Меню</h3>
+                <h3>Компания</h3>
                 <ul>
-                    <li><a href="index.html">Главная</a></li>
-                    <li><a href="services.html">Услуги</a></li>
-                    <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="account.html">Личный кабинет</a></li>
-                </ul>
-            </div>
-            <div class="footer-column">
-                <h3>Режим работы</h3>
-                <ul>
-                    <li>Пн-Пт: 9:00 - 18:00</li>
-                    <li>Сб: 10:00 - 15:00</li>
-                    <li>Вс: выходной</li>
+                    <li><a href="mission.html">Наша миссия</a></li>
+                    <li><a href="payment.html">Оплата</a></li>
                 </ul>
             </div>
         </div>
         <div class="container copyright">
-            <p>&copy; 2023 Типография "Призма". Все права защищены.</p>
+            <p>&copy; 2025 ООО"Типография Призма". Все права защищены.</p>
         </div>
     </footer>
 
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
-<script>
-    // Инициализация Firebase
-    const firebaseConfig = {
-        apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
-        authDomain: "prisma-print.firebaseapp.com",
-        projectId: "prisma-print",
-        storageBucket: "prisma-print.appspot.com",
-        messagingSenderId: "165546230296",
-        appId: "1:165546230296:web:7b816c389d23f5b762396d"
-    };
-
-    // Инициализация Firebase
-    const app = firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-
-    // Функция для форматирования даты
-    const formatDate = (timestamp) => {
-        if (!timestamp || !timestamp.toDate) return 'Дата не указана';
-        try {
-            const date = timestamp.toDate();
-            return date.toLocaleDateString('ru-RU', {
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-        } catch (e) {
-            console.error("Ошибка форматирования даты:", e);
-            return 'Неверный формат даты';
-        }
-    };
-
-    // Функция для получения названия продукта
-    const getProductName = (type) => {
-        const names = {
-            'visiting-card': 'Визитки',
-            'sticker': 'Наклейки',
-            'postcard': 'Открытки',
-            'booklet': 'Буклеты',
-            'magazine': 'Журналы',
-            'box': 'Коробки',
-            'calendar': 'Календари',
-            'notebook': 'Блокноты'
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
+            authDomain: "prisma-print.firebaseapp.com",
+            projectId: "prisma-print",
+            storageBucket: "prisma-print.appspot.com",
+            messagingSenderId: "165546230296",
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
-        return names[type] || type;
-    };
 
-    // Функция для получения статуса заказа
-    const getStatusName = (status) => {
-        const statuses = {
-            'new': 'Новый',
-            'processing': 'В обработке',
-            'production': 'В производстве',
-            'completed': 'Завершен',
-            'shipped': 'Отправлен',
-            'cancelled': 'Отменен'
-        };
-        return statuses[status] || status;
-    };
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
 
-    // Основная функция загрузки данных
-    auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-            window.location.href = 'login.html';
-            return;
-        }
-
-        console.log('Текущий пользователь UID:', user.uid);
-        const ordersList = document.getElementById('orders-list');
-        
-        // Полностью очищаем список перед загрузкой
-        ordersList.innerHTML = '<div class="no-orders"><p>Загрузка ваших заказов...</p></div>';
-
-        try {
-            // Загрузка заказов пользователя
-            const ordersQuery = db.collection('orders')
-                .where('userId', '==', user.uid)
-                .orderBy('date', 'desc');
-
-            const ordersSnapshot = await ordersQuery.get();
-            console.log('Найдено заказов:', ordersSnapshot.size);
-            
-            // Полностью очищаем список перед отображением результатов
-            ordersList.innerHTML = '';
-
-            if (ordersSnapshot.empty) {
-                ordersList.innerHTML = '<div class="no-orders"><p>У вас пока нет заказов</p></div>';
+        // Загрузка данных пользователя и заказов
+        auth.onAuthStateChanged(async (user) => {
+            if (!user || !user.emailVerified) {
+                window.location.href = 'login.html';
                 return;
             }
 
-            // Создаем фрагмент для оптимизации добавления элементов
-            const fragment = document.createDocumentFragment();
+            // Загрузка данных профиля
+            const userDoc = await db.collection('clients').doc(user.uid).get();
+            if (userDoc.exists) {
+                const userData = userDoc.data();
+                document.getElementById('user-name').textContent = `${userData.name} ${userData.surname}`;
+                document.getElementById('user-email').textContent = user.email;
+                document.getElementById('user-phone').textContent = userData.phone || 'Не указан';
+                document.getElementById('user-company').textContent = userData.company || 'Не указана';
+                
+                // Устанавливаем аватарку с инициалами
+                const initials = (userData.name ? userData.name.charAt(0) : '') + (userData.surname ? userData.surname.charAt(0) : '');
+                document.getElementById('user-avatar').textContent = initials || '?';
+            }
 
-            ordersSnapshot.forEach(doc => {
-                const order = doc.data();
-                console.log('Заказ из БД:', doc.id, order);
+            // Загрузка заказов пользователя
+            const ordersQuery = await db.collection('orders')
+                .where('userId', '==', user.uid)
+                .orderBy('createdAt', 'desc')
+                .get();
 
-                const orderItem = document.createElement('div');
-                orderItem.className = 'order-item';
-                orderItem.innerHTML = `
-                    <div class="order-header">
-                        <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
-                        <span class="order-date">${formatDate(order.date)}</span>
-                    </div>
-                    <div class="order-details">
-                        <p><strong>Тип:</strong> ${order.productName || getProductName(order.productType)}</p>
-                        <p><strong>Статус:</strong> <span class="status-${order.status}">${getStatusName(order.status)}</span></p>
-                        <p><strong>Сумма:</strong> ${order.price?.toFixed(2) || '0.00'} ₽</p>
-                        <p><strong>Количество:</strong> ${order.quantity || '1'}</p>
-                    </div>
-                `;
-                fragment.appendChild(orderItem);
-            });
-
-            ordersList.appendChild(fragment);
-
-        } catch (error) {
-            console.error('Ошибка загрузки заказов:', error);
-            ordersList.innerHTML = `
-                <div class="no-orders">
-                    <p>Ошибка загрузки заказов</p>
-                    <p>Пожалуйста, попробуйте позже</p>
-                </div>
-            `;
-        }
-    });
-
-    // Выход из системы
-    document.getElementById('logout-btn').addEventListener('click', (e) => {
-        e.preventDefault();
-        auth.signOut().then(() => {
-            window.location.href = 'login.html';
-        }).catch(error => {
-            console.error('Ошибка при выходе:', error);
-            alert('Не удалось выйти из системы');
+            const ordersList = document.getElementById('orders-list');
+            
+            if (ordersQuery.empty) {
+                ordersList.innerHTML = '<div class="no-orders">У вас пока нет заказов</div>';
+            } else {
+                ordersList.innerHTML = '';
+                ordersQuery.forEach(doc => {
+                    const order = doc.data();
+                    const orderDate = order.createdAt ? order.createdAt.toDate().toLocaleDateString() : 'Дата не указана';
+                    
+                    let statusClass = 'status-new';
+                    let statusText = 'Новый';
+                    
+                    if (order.status === 'in-progress') {
+                        statusClass = 'status-in-progress';
+                        statusText = 'В работе';
+                    } else if (order.status === 'completed') {
+                        statusClass = 'status-completed';
+                        statusText = 'Завершен';
+                    } else if (order.status === 'cancelled') {
+                        statusClass = 'status-cancelled';
+                        statusText = 'Отменен';
+                    }
+                    
+                    const orderElement = document.createElement('div');
+                    orderElement.className = 'order-item';
+                    orderElement.innerHTML = `
+                        <div class="order-header">
+                            <span>Заказ №${doc.id}</span>
+                            <span class="order-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div>${order.productName} (${order.quantity} шт.)</div>
+                        <div>Сумма: ${order.price.toFixed(2)} ₽</div>
+                        <div>Дата: ${orderDate}</div>
+                        <div class="order-details">
+                            <div class="order-detail">
+                                <strong>Материал</strong>
+                                <span>${order.materialName || 'Не указан'}</span>
+                            </div>
+                            <div class="order-detail">
+                                <strong>Статус</strong>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                    ordersList.appendChild(orderElement);
+                });
+            }
         });
-    });
-</script>
+
+        // Выход из системы
+        document.getElementById('logout-link').addEventListener('click', async (e) => {
+            e.preventDefault();
+            try {
+                await auth.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                alert('Ошибка при выходе из системы: ' + error.message);
+            }
+        });
+
+        // Изменение пароля
+        document.getElementById('change-password-btn').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const newPassword = prompt('Введите новый пароль (не менее 6 символов):');
+            if (!newPassword || newPassword.length < 6) {
+                alert('Пароль должен содержать не менее 6 символов');
+                return;
+            }
+
+            try {
+                await user.updatePassword(newPassword);
+                alert('Пароль успешно изменен!');
+            } catch (error) {
+                if (error.code === 'auth/requires-recent-login') {
+                    if (confirm('Для изменения пароля требуется повторная аутентификация. Войти снова?')) {
+                        await auth.signOut();
+                        window.location.href = 'login.html';
+                    }
+                } else {
+                    alert('Ошибка при изменении пароля: ' + error.message);
+                }
+            }
+        });
+
+        // Редактирование профиля
+        document.getElementById('edit-profile-btn').addEventListener('click', async () => {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const userDoc = await db.collection('clients').doc(user.uid).get();
+            if (!userDoc.exists) return;
+
+            const userData = userDoc.data();
+            const newName = prompt('Имя:', userData.name || '');
+            const newSurname = prompt('Фамилия:', userData.surname || '');
+            const newPhone = prompt('Телефон:', userData.phone || '');
+            const newCompany = prompt('Компания:', userData.company || '');
+
+            if (newName !== null && newSurname !== null) {
+                try {
+                    await db.collection('clients').doc(user.uid).update({
+                        name: newName,
+                        surname: newSurname,
+                        phone: newPhone,
+                        company: newCompany
+                    });
+                    alert('Профиль успешно обновлен!');
+                    location.reload();
+                } catch (error) {
+                    alert('Ошибка при обновлении профиля: ' + error.message);
+                }
+            }
+        });
+
+        // Удаление аккаунта
+        document.getElementById('delete-account-btn').addEventListener('click', async () => {
+            if (!confirm('Вы уверены, что хотите удалить свой аккаунт? Это действие нельзя отменить.')) {
+                return;
+            }
+
+            const user = auth.currentUser;
+            if (!user) return;
+
+            try {
+                // Удаляем данные пользователя из Firestore
+                await db.collection('clients').doc(user.uid).delete();
+                
+                // Удаляем аккаунт из Auth
+                await user.delete();
+                
+                alert('Ваш аккаунт был успешно удален.');
+                window.location.href = 'index.html';
+            } catch (error) {
+                if (error.code === 'auth/requires-recent-login') {
+                    if (confirm('Для удаления аккаунта требуется повторная аутентификация. Войти снова?')) {
+                        await auth.signOut();
+                        window.location.href = 'login.html';
+                    }
+                } else {
+                    alert('Ошибка при удалении аккаунта: ' + error.message);
+                }
+            }
+        });
+    </script>
 </body>
 </html>
