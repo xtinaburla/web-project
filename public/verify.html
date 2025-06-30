@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Подтверждение email | Типография Призма</title>
     <style>
-        /* Стили остаются без изменений */
         :root {
             --primary: #239439;
             --secondary: #A9B4B5;
@@ -264,6 +263,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         const mode = urlParams.get('mode');
         const actionCode = urlParams.get('oobCode');
+        const email = urlParams.get('email');
         
         if (mode === 'verifyEmail' && actionCode) {
             // Пытаемся применить код подтверждения
@@ -294,21 +294,21 @@
         // Обработка повторной отправки письма
         document.getElementById('resend-email').addEventListener('click', async (e) => {
             e.preventDefault();
-            const email = new URLSearchParams(window.location.search).get('email');
             
-            if (email) {
-                try {
-                    // Отправляем письмо подтверждения на указанный email
-                    await auth.sendSignInLinkToEmail(email, {
-                        url: window.location.origin + '/login.html',
-                        handleCodeInApp: true
-                    });
-                    showStatus('Письмо отправлено повторно! Проверьте вашу почту.', 'success');
-                } catch (error) {
-                    showStatus('Ошибка: ' + error.message, 'error');
-                }
-            } else {
+            if (!email) {
                 showStatus('Для повторной отправки письма необходимо указать email.', 'error');
+                return;
+            }
+
+            try {
+                // Отправляем письмо подтверждения на указанный email
+                await auth.sendSignInLinkToEmail(email, {
+                    url: window.location.origin + '/verify.html',
+                    handleCodeInApp: true
+                });
+                showStatus('Письмо отправлено повторно! Проверьте вашу почту.', 'success');
+            } catch (error) {
+                showStatus('Ошибка: ' + error.message, 'error');
             }
         });
 
