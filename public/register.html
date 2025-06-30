@@ -33,7 +33,6 @@
             padding: 0 20px;
         }
         
-        /* Шапка */
         header {
             background-color: var(--primary);
             padding: 15px 0;
@@ -79,7 +78,6 @@
             opacity: 0.8;
         }
         
-        /* Герой-баннер */
         .hero-account {
             background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.vuzopedia.ru/storage/app/uploads/public/5f6/234/043/5f62340436019282505345.jpg') center/cover;
             color: var(--light);
@@ -91,7 +89,6 @@
             font-size: 36px;
         }
         
-        /* Секция аккаунта */
         .account-section {
             padding: 50px 0;
         }
@@ -178,111 +175,6 @@
             font-size: 14px;
             margin-top: 5px;
             display: none;
-        }
-        
-        /* Стили для страницы подтверждения */
-        .form-group p {
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        /* Стили для личного кабинета */
-        .orders-container {
-            background: var(--light);
-            border-radius: 8px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-        }
-        
-        .orders-container h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            font-size: 24px;
-            text-align: center;
-        }
-        
-        .order-item {
-            border: 1px solid #eee;
-            border-radius: 4px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
-        
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-weight: 500;
-        }
-        
-        .no-orders {
-            text-align: center;
-            padding: 20px;
-            color: #666;
-        }
-        
-        /* Футер */
-        footer {
-            background-color: var(--dark);
-            color: var(--light);
-            padding: 30px 0 20px;
-            margin-top: 50px;
-        }
-        
-        .footer-content {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-        
-        .footer-column h3 {
-            font-size: 20px;
-            margin-bottom: 20px;
-            color: var(--secondary);
-        }
-        
-        .footer-column ul {
-            list-style: none;
-        }
-        
-        .footer-column ul li {
-            margin-bottom: 10px;
-        }
-        
-        .footer-column ul li a {
-            color: var(--light);
-            text-decoration: none;
-            transition: color 0.3s;
-        }
-        
-        .footer-column ul li a:hover {
-            color: var(--secondary);
-        }
-        
-        .copyright {
-            text-align: center;
-            padding-top: 20px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            nav ul {
-                gap: 15px;
-            }
-            
-            .footer-content {
-                grid-template-columns: 1fr;
-            }
-            
-            .account-container {
-                padding: 20px;
-            }
         }
     </style>
 </head>
@@ -399,11 +291,15 @@
             
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
             const btn = e.target.querySelector('button[type="submit"]');
             
-            if (password !== document.getElementById('reg-confirm-password').value) {
+            // Проверка совпадения паролей
+            if (password !== confirmPassword) {
                 document.getElementById('password-match-error').style.display = 'block';
                 return;
+            } else {
+                document.getElementById('password-match-error').style.display = 'none';
             }
 
             btn.disabled = true;
@@ -432,7 +328,10 @@
                     url: window.location.origin + '/verify.html'
                 });
                 
-                alert('Регистрация успешна! Проверьте почту для подтверждения.');
+                // 4. Выходим из системы, чтобы пользователь подтвердил email
+                await auth.signOut();
+                
+                // 5. Перенаправляем на страницу подтверждения
                 window.location.href = 'verify.html';
                 
             } catch (error) {
