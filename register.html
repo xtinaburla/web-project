@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Вход | Типография Призма</title>
+    <title>Регистрация | Типография Призма</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js"></script>
@@ -197,6 +197,13 @@
             margin-top: 15px;
         }
         
+        .text-danger {
+            color: var(--danger);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
         footer {
             background-color: var(--dark);
             color: var(--light);
@@ -228,7 +235,7 @@
                 <ul>
                     <li><a href="index.html">Главная</a></li>
                     <li><a href="contacts.html">Контакты</a></li>
-                    <li><a href="register.html">Регистрация</a></li>
+                    <li><a href="login.html">Вход</a></li>
                 </ul>
             </nav>
         </div>
@@ -236,7 +243,7 @@
 
     <section class="hero-account">
         <div class="container">
-            <h1>Вход в личный кабинет</h1>
+            <h1>Регистрация</h1>
         </div>
     </section>
 
@@ -244,19 +251,40 @@
         <div class="container">
             <div class="account-container">
                 <div class="auth-form">
-                    <h2>Вход</h2>
-                    <form id="loginForm">
+                    <h2>Создать аккаунт</h2>
+                    <form id="registerForm">
                         <div class="form-group">
-                            <label for="login-email">Электронная почта</label>
-                            <input type="email" class="form-control" id="login-email" required>
+                            <label for="reg-name">Имя</label>
+                            <input type="text" class="form-control" id="reg-name" required>
                         </div>
                         <div class="form-group">
-                            <label for="login-password">Пароль</label>
-                            <input type="password" class="form-control" id="login-password" required>
+                            <label for="reg-surname">Фамилия</label>
+                            <input type="text" class="form-control" id="reg-surname" required>
                         </div>
-                        <button type="submit" class="btn">Войти</button>
+                        <div class="form-group">
+                            <label for="reg-phone">Телефон</label>
+                            <input type="tel" class="form-control" id="reg-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Электронная почта</label>
+                            <input type="email" class="form-control" id="reg-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-company">Название компании или ИНН</label>
+                            <input type="text" class="form-control" id="reg-company" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Пароль</label>
+                            <input type="password" class="form-control" id="reg-password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Подтвердите пароль</label>
+                            <input type="password" class="form-control" id="reg-confirm-password" required>
+                            <div class="text-danger" id="password-match-error">Пароли не совпадают</div>
+                        </div>
+                        <button type="submit" class="btn">Зарегистрироваться</button>
                         <div class="text-center mt-3">
-                            <a href="register.html" class="btn-link">Нет аккаунта? Зарегистрируйтесь</a>
+                            <a href="login.html" class="btn-link">Уже есть аккаунт? Войдите</a>
                         </div>
                     </form>
                 </div>
@@ -304,27 +332,54 @@
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Обработка формы входа
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        // Проверка совпадения паролей
+        document.getElementById('reg-confirm-password').addEventListener('input', function() {
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = this.value;
+            const errorElement = document.getElementById('password-match-error');
+            
+            if (password !== confirmPassword) {
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Обработка формы регистрации
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
             
+            if (password !== confirmPassword) {
+                alert('Пароли не совпадают!');
+                return;
+            }
+
             try {
-                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                // Создание пользователя
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                if (user && !user.emailVerified) {
-                    alert('Пожалуйста, подтвердите ваш email перед входом.');
-                    await auth.signOut();
-                    return;
-                }
+                // Сохранение дополнительных данных в Firestore
+                await db.collection('clients').doc(user.uid).set({
+                    name: document.getElementById('reg-name').value,
+                    surname: document.getElementById('reg-surname').value,
+                    phone: document.getElementById('reg-phone').value,
+                    email: email,
+                    company: document.getElementById('reg-company').value,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 
-                // Перенаправление в личный кабинет после успешного входа
-                window.location.href = 'account.html';
+                // Отправка письма для подтверждения email
+                await user.sendEmailVerification();
+                
+                alert('Регистрация успешна! На вашу почту отправлено письмо для подтверждения.');
+                window.location.href = 'login.html';
             } catch (error) {
-                alert('Ошибка входа: ' + error.message);
+                alert('Ошибка регистрации: ' + error.message);
             }
         });
 
