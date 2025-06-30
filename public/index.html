@@ -409,9 +409,9 @@
             </div>
             <nav>
                 <ul>
-                <li><a href="index.html">Главная</a></li>
-		<li><a href="contacts.html">Контакты</a></li>
-		<li><a href="login.html">Личный кабинет</a></li>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="login.html">Личный кабинет</a></li>
                 </ul>
             </nav>
         </div>
@@ -520,28 +520,6 @@
                         <a href="#calculator" class="btn">Заказать</a>
                     </div>
                 </div>
-
-                <!-- Листовки и флаеры -->
-                <div class="service-card">
-                    <img src="https://i.pinimg.com/736x/42/f3/36/42f3365dc0f7ed81ad104a1709f31a0b.jpg" alt="Листовки">
-                    <div class="service-card-content">
-                        <h3>Листовки и флаеры</h3>
-                        <p>Стандартные форматы, печать на мелованной бумаге.</p>
-                        <p class="price">от 150 ₽</p>
-                        <a href="#calculator" class="btn">Заказать</a>
-                    </div>
-                </div>
-
-                <!-- Книги -->
-                <div class="service-card">
-                    <img src="https://i.pinimg.com/736x/b4/6e/5c/b46e5c25455e0b848fdc4df96e851fb4.jpg" alt="Книги">
-                    <div class="service-card-content">
-                        <h3>Книги</h3>
-                        <p>Мягкая и твёрдая обложка, различные форматы.</p>
-                        <p class="price">от 2500 ₽</p>
-                        <a href="#calculator" class="btn">Заказать</a>
-                    </div>
-                </div>
             </div>
         </div>
     </section>
@@ -563,13 +541,11 @@
                             <option value="box">Коробки</option>
                             <option value="calendar">Календари</option>
                             <option value="notebook">Блокноты</option>
-                            <option value="flyer">Листовки</option>
-                            <option value="book">Книги</option>
                         </select>
                     </div>
                     <div class="form-group">
                         <label for="quantity">Тираж (шт.)</label>
-                        <input type="number" id="quantity" min="500" value="500">
+                        <input type="number" id="quantity" min="100" value="500">
                     </div>
                     <div class="form-group">
                         <label for="material-type">Материал</label>
@@ -707,7 +683,7 @@
                     <h3>О компании</h3>
                     <ul>
                         <li><a href="mission.html">Наша миссия</a></li>
-			<li><a href="payment.html">Оплата</a></li>
+                        <li><a href="payment.html">Оплата</a></li>
                     </ul>
                 </div>
             </div>
@@ -717,14 +693,15 @@
         </div>
     </footer>
 
-    <!-- Добавляем Firebase SDK -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-storage.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-functions.js"></script>
 
     <script>
-        // Инициализация Firebase с вашей конфигурацией
+        // Инициализация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -733,29 +710,26 @@
             messagingSenderId: "165546230296",
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
-        
+
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
         const storage = firebase.storage();
+        const functions = firebase.functions();
 
-        // Проверка состояния авторизации
+        // Проверка авторизации
         auth.onAuthStateChanged(user => {
             const orderButton = document.getElementById('order-button');
             const authNotice = document.getElementById('auth-notice');
             
             if (user) {
-                // Пользователь авторизован
                 orderButton.disabled = false;
                 orderButton.classList.remove('btn-disabled');
                 authNotice.style.display = 'none';
-                console.log('Пользователь вошел:', user.email);
             } else {
-                // Пользователь не авторизован
                 orderButton.disabled = true;
                 orderButton.classList.add('btn-disabled');
                 authNotice.style.display = 'flex';
-                console.log('Пользователь не авторизован');
             }
         });
 
@@ -763,10 +737,8 @@
         const materialLimitations = {
             'box': ['cardboard'],
             'magazine': ['offset', 'coated', 'design'],
-            'book': ['offset', 'coated', 'design'],
             'calendar': ['offset', 'coated', 'cardboard'],
             'notebook': ['offset', 'coated', 'design', 'kraft'],
-            'flyer': ['offset', 'coated', 'self-adhesive'],
             'sticker': ['self-adhesive']
         };
 
@@ -799,6 +771,12 @@
                     '100-130': 0.1,
                     '150-200': 0.2,
                     '250-350': 0.3
+                },
+                lamination: {
+                    'none': 0,
+                    'glossy': 0.3,
+                    'matte': 0.4,
+                    'soft': 0.5
                 }
             },
             'sticker': { 
@@ -847,23 +825,6 @@
                 binding: { 'clip': 0, 'spring': 2 },
                 format: { 'a5': 0, 'a6': -1 },
                 pages: 0.1
-            },
-            'flyer': { 
-                minPrice: 150,
-                base: 0.3,
-                format: { 'a4': 0, 'a5': -0.1, 'a6': -0.15 },
-                quantityDiscount: {
-                    '1000': 0.05,
-                    '5000': 0.1,
-                    '10000': 0.15
-                }
-            },
-            'book': { 
-                minPrice: 2500,
-                base: 15,
-                pages: { perPage: 0.08 },
-                binding: { 'soft': 0, 'hard': 5 },
-                cover: { 'lamination': 3, 'foil': 5, 'none': 0 }
             }
         };
 
@@ -1046,73 +1007,6 @@
                     </div>
                 </div>
             `,
-            'book': `
-                <div class="form-group">
-                    <label>Формат</label>
-                    <div class="options-group">
-                        <input type="radio" id="book-format-1" name="book-format" value="a4" class="option-checkbox">
-                        <label for="book-format-1" class="option-label">А4</label>
-                        
-                        <input type="radio" id="book-format-2" name="book-format" value="a5" class="option-checkbox" checked>
-                        <label for="book-format-2" class="option-label">А5</label>
-                        
-                        <input type="radio" id="book-format-3" name="book-format" value="a6" class="option-checkbox">
-                        <label for="book-format-3" class="option-label">А6</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Количество страниц</label>
-                    <input type="number" id="book-pages" min="16" max="500" value="100">
-                </div>
-                <div class="form-group">
-                    <label>Переплет</label>
-                    <div class="options-group">
-                        <input type="radio" id="book-binding-1" name="book-binding" value="hard" class="option-checkbox">
-                        <label for="book-binding-1" class="option-label">Твердый</label>
-                        
-                        <input type="radio" id="book-binding-2" name="book-binding" value="soft" class="option-checkbox" checked>
-                        <label for="book-binding-2" class="option-label">Мягкий</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Обложка</label>
-                    <div class="options-group">
-                        <input type="radio" id="book-cover-1" name="book-cover" value="none" class="option-checkbox" checked>
-                        <label for="book-cover-1" class="option-label">Без обработки</label>
-                        
-                        <input type="radio" id="book-cover-2" name="book-cover" value="lamination" class="option-checkbox">
-                        <label for="book-cover-2" class="option-label">Ламинация</label>
-                        
-                        <input type="radio" id="book-cover-3" name="book-cover" value="foil" class="option-checkbox">
-                        <label for="book-cover-3" class="option-label">Тиснение</label>
-                    </div>
-                </div>
-            `,
-            'flyer': `
-                <div class="form-group">
-                    <label>Формат</label>
-                    <div class="options-group">
-                        <input type="radio" id="flyer-format-1" name="flyer-format" value="a4" class="option-checkbox" checked>
-                        <label for="flyer-format-1" class="option-label">А4</label>
-                        
-                        <input type="radio" id="flyer-format-2" name="flyer-format" value="a5" class="option-checkbox">
-                        <label for="flyer-format-2" class="option-label">А5</label>
-                        
-                        <input type="radio" id="flyer-format-3" name="flyer-format" value="a6" class="option-checkbox">
-                        <label for="flyer-format-3" class="option-label">А6</label>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label>Количество сторон</label>
-                    <div class="options-group">
-                        <input type="radio" id="flyer-sides-1" name="flyer-sides" value="one" class="option-checkbox" checked>
-                        <label for="flyer-sides-1" class="option-label">Односторонние</label>
-                        
-                        <input type="radio" id="flyer-sides-2" name="flyer-sides" value="two" class="option-checkbox">
-                        <label for="flyer-sides-2" class="option-label">Двусторонние</label>
-                    </div>
-                </div>
-            `,
             'box': `
                 <div class="form-group">
                     <label>Тип коробки</label>
@@ -1140,7 +1034,7 @@
             `
         };
 
-        // Калькулятор стоимости с минимальными ценами и исправленными формулами
+        // Калькулятор стоимости с минимальными ценами
         const updatePrice = () => {
             const productType = document.getElementById('product-type').value;
             const quantity = parseInt(document.getElementById('quantity').value) || 500;
@@ -1171,7 +1065,7 @@
                 basePrice += laminationPrice;
                 
                 // Если двухсторонняя ламинация
-                if (laminationSide === 'two' && (productType === 'postcard' || productType === 'flyer')) {
+                if (laminationSide === 'two' && (productType === 'postcard')) {
                     basePrice += laminationPrice * 0.7;
                 }
             }
@@ -1180,8 +1074,8 @@
             if (foilType !== 'none') {
                 if (productType === 'box') {
                     basePrice += productPrice.foil;
-                } else if (productType === 'magazine' || productType === 'book') {
-                    const coverType = document.querySelector(`input[name="${productType}-cover"]:checked`)?.value;
+                } else if (productType === 'magazine') {
+                    const coverType = document.querySelector('input[name="magazine-cover"]:checked')?.value;
                     if (coverType === 'foil') {
                         basePrice += productPrice.cover.foil;
                     }
@@ -1252,38 +1146,6 @@
                 basePrice += pages * productPrice.pages;
             }
             
-            if (productType === 'book') {
-                const pages = parseInt(document.getElementById('book-pages')?.value || 100);
-                basePrice += pages * productPrice.pages.perPage;
-                
-                const binding = document.querySelector('input[name="book-binding"]:checked')?.value;
-                basePrice += productPrice.binding[binding];
-                
-                const cover = document.querySelector('input[name="book-cover"]:checked')?.value;
-                if (cover !== 'none') {
-                    basePrice += productPrice.cover[cover];
-                }
-            }
-            
-            if (productType === 'flyer') {
-                const format = document.querySelector('input[name="flyer-format"]:checked')?.value;
-                basePrice += productPrice.format[format];
-                
-                const sides = document.querySelector('input[name="flyer-sides"]:checked')?.value;
-                if (sides === 'two') basePrice *= 1.4;
-                
-                // Скидки за объем для листовок
-                if (productPrice.quantityDiscount) {
-                    if (quantity >= 10000) {
-                        basePrice *= (1 - productPrice.quantityDiscount['10000']);
-                    } else if (quantity >= 5000) {
-                        basePrice *= (1 - productPrice.quantityDiscount['5000']);
-                    } else if (quantity >= 1000) {
-                        basePrice *= (1 - productPrice.quantityDiscount['1000']);
-                    }
-                }
-            }
-            
             if (productType === 'box') {
                 const type = document.querySelector('input[name="box-type"]:checked')?.value;
                 if (type === 'custom') basePrice *= 1.5;
@@ -1295,7 +1157,7 @@
             
             // Рассчитываем общую стоимость и применяем минимальную цену
             let total = basePrice * quantity;
-            total = Math.max(minPrice, Math.round(total * 100) / 100);
+            total = Math.max(minPrice, Math.round(total * 100) / 100); // Важное исправление - учитываем minPrice
             
             document.querySelector('.total-price').textContent = `${total.toFixed(2)} ₽`;
         };
@@ -1332,7 +1194,7 @@
             
             // Показываем/скрываем группы опций
             laminationGroup.style.display = productType === 'box' ? 'none' : 'block';
-            laminationSideGroup.style.display = (productType === 'postcard' || productType === 'flyer') ? 'block' : 'none';
+            laminationSideGroup.style.display = (productType === 'postcard') ? 'block' : 'none';
             foilGroup.style.display = 'block';
             
             // Добавляем специфичные опции для продукта
@@ -1420,7 +1282,7 @@
         document.getElementById('price-calculator').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            // Проверяем авторизацию
+            // Проверка авторизации
             const user = auth.currentUser;
             if (!user) {
                 alert('Для оформления заказа войдите в систему!');
@@ -1428,11 +1290,10 @@
                 return;
             }
             
-            // Собираем данные заказа
+            // Сбор данных заказа
             const orderData = {
                 userId: user.uid,
                 userEmail: user.email,
-                userName: user.displayName || '',
                 productType: document.getElementById('product-type').value,
                 productName: document.getElementById('product-type').options[document.getElementById('product-type').selectedIndex].text,
                 quantity: parseInt(document.getElementById('quantity').value),
@@ -1440,97 +1301,45 @@
                 materialName: document.getElementById('material-type').options[document.getElementById('material-type').selectedIndex].text,
                 density: document.querySelector('input[name="density"]:checked').value,
                 lamination: document.querySelector('input[name="lamination"]:checked').value,
-                laminationSide: document.querySelector('input[name="lamination-side"]:checked')?.value || 'one',
                 foilType: document.getElementById('foil-type').value,
                 comment: document.getElementById('order-comment').value,
                 price: parseFloat(document.querySelector('.total-price').textContent.replace(' ₽', '')),
-                status: 'Новый',
-                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                status: 'new',
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
             };
 
-            // Добавляем специфичные опции для продукта
-            const productType = orderData.productType;
-            const productOptions = {};
-            
-            if (productType === 'visiting-card') {
-                productOptions.size = document.querySelector('input[name="visiting-size"]:checked').value;
-                productOptions.sides = document.querySelector('input[name="visiting-sides"]:checked').value;
-            } else if (productType === 'sticker') {
-                productOptions.format = document.querySelector('input[name="sticker-format"]:checked').value;
-                productOptions.cut = document.querySelector('input[name="sticker-cut"]:checked').value;
-                if (productOptions.cut === 'die-cut') {
-                    productOptions.diameter = document.querySelector('input[name="sticker-diameter"]:checked')?.value;
-                }
-            } else if (productType === 'postcard') {
-                productOptions.print = document.querySelector('input[name="postcard-print"]:checked').value;
-            } else if (productType === 'booklet') {
-                productOptions.format = document.querySelector('input[name="booklet-format"]:checked').value;
-            } else if (productType === 'magazine') {
-                productOptions.pages = parseInt(document.getElementById('magazine-pages').value);
-                productOptions.binding = document.querySelector('input[name="magazine-binding"]:checked').value;
-                productOptions.cover = document.querySelector('input[name="magazine-cover"]:checked').value;
-            } else if (productType === 'calendar') {
-                productOptions.type = document.querySelector('input[name="calendar-type"]:checked').value;
-            } else if (productType === 'notebook') {
-                productOptions.binding = document.querySelector('input[name="notebook-binding"]:checked').value;
-                productOptions.format = document.querySelector('input[name="notebook-format"]:checked').value;
-                productOptions.pages = parseInt(document.getElementById('notebook-pages').value);
-                productOptions.ruling = document.querySelector('input[name="notebook-ruling"]:checked').value;
-            } else if (productType === 'book') {
-                productOptions.pages = parseInt(document.getElementById('book-pages').value);
-                productOptions.binding = document.querySelector('input[name="book-binding"]:checked').value;
-                productOptions.cover = document.querySelector('input[name="book-cover"]:checked').value;
-            } else if (productType === 'flyer') {
-                productOptions.format = document.querySelector('input[name="flyer-format"]:checked').value;
-                productOptions.sides = document.querySelector('input[name="flyer-sides"]:checked').value;
-            } else if (productType === 'box') {
-                productOptions.type = document.querySelector('input[name="box-type"]:checked').value;
-                productOptions.size = document.querySelector('input[name="box-size"]:checked').value;
-            }
-
-            // Объединяем основные данные и опции
-            const fullOrderData = {...orderData, ...productOptions};
-
             try {
-                // Сохраняем заказ в Firestore
-                const docRef = await db.collection('orders').add(fullOrderData);
-                console.log('Заказ создан с ID:', docRef.id);
+                // 1. Сохраняем заказ в Firestore
+                const docRef = await db.collection('orders').add(orderData);
+                console.log('Заказ сохранен с ID:', docRef.id);
                 
-                // Обработка загрузки файла, если есть
+                // 2. Загрузка файла (если есть)
                 const fileInput = document.getElementById('file-upload');
                 if (fileInput.files.length > 0) {
                     const file = fileInput.files[0];
-                    const storageRef = storage.ref();
-                    const fileRef = storageRef.child(`orders/${docRef.id}/${file.name}`);
-                    
-                    // Загружаем файл
+                    const fileRef = storage.ref(`orders/${docRef.id}/${file.name}`);
                     await fileRef.put(file);
                     const fileUrl = await fileRef.getDownloadURL();
-                    
-                    // Обновляем заказ с ссылкой на файл
                     await db.collection('orders').doc(docRef.id).update({
                         fileUrl: fileUrl,
                         fileName: file.name
                     });
-                    console.log('Файл загружен:', fileUrl);
                 }
                 
-                // Уведомление пользователя
-                alert(`Заказ №${docRef.id} успешно оформлен!\nМенеджер свяжется с вами в ближайшее время.`);
-                
-                // Сброс формы
-                this.reset();
-                document.querySelectorAll('.foil-circle').forEach(circle => {
-                    circle.classList.remove('selected');
+                // 3. Отправка email уведомления через Cloud Function
+                const sendEmail = functions.httpsCallable('sendOrderEmail');
+                await sendEmail({
+                    orderId: docRef.id,
+                    ...orderData
                 });
-                document.getElementById('foil-type').value = 'none';
-                document.getElementById('file-name').textContent = 'Файл не выбран';
-                document.querySelector('.total-price').textContent = '0 ₽';
+                
+                // 4. Уведомление пользователя
+                alert(`Заказ №${docRef.id} успешно оформлен! Менеджер свяжется с вами в ближайшее время.`);
+                window.location.href = 'account.html';
                 
             } catch (error) {
-                console.error('Ошибка при оформлении заказа:', error);
-                alert(`Произошла ошибка: ${error.message}\nПожалуйста, попробуйте еще раз или свяжитесь с нами.`);
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при оформлении заказа. Пожалуйста, попробуйте еще раз.');
             }
         });
 

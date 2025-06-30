@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация | Типография Призма</title>
+    <style>
+        :root {
+            --primary: #239439;
+            --secondary: #A9B4B5;
+            --dark: #333333;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --error: #dc3545;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background-color: var(--gray);
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Шапка */
+        header {
+            background-color: var(--primary);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 50px;
+        }
+        
+        .logo h1 {
+            color: var(--light);
+            font-size: 24px;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            font-size: 18px;
+        }
+        
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+        
+        /* Герой-баннер */
+        .hero-account {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.vuzopedia.ru/storage/app/uploads/public/5f6/234/043/5f62340436019282505345.jpg') center/cover;
+            color: var(--light);
+            padding: 60px 0;
+            text-align: center;
+        }
+        
+        .hero-account h1 {
+            font-size: 36px;
+        }
+        
+        /* Секция аккаунта */
+        .account-section {
+            padding: 50px 0;
+        }
+        
+        .account-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: var(--light);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .auth-form h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary);
+            outline: none;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            background-color: var(--primary);
+            color: var(--light);
+            padding: 12px;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s;
+            border: none;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        
+        .btn:hover {
+            background-color: #1c7a2e;
+        }
+        
+        .btn-link {
+            color: var(--primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .btn-link:hover {
+            text-decoration: underline;
+        }
+        
+        .text-center {
+            text-align: center;
+        }
+        
+        .mt-3 {
+            margin-top: 15px;
+        }
+        
+        .text-danger {
+            color: var(--error);
+            font-size: 14px;
+            margin-top: 5px;
+            display: none;
+        }
+        
+        /* Стили для страницы подтверждения */
+        .form-group p {
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        /* Стили для личного кабинета */
+        .orders-container {
+            background: var(--light);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+        
+        .orders-container h2 {
+            color: var(--primary);
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        
+        .order-item {
+            border: 1px solid #eee;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+        
+        /* Футер */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 30px 0 20px;
+            margin-top: 50px;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: var(--light);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--secondary);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                gap: 15px;
+            }
+            
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .account-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="https://xtinaburla.github.io/prismalogo.jpg" alt="Логотип Призма">
+                <h1>Призма</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="login.html">Вход</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-account">
+        <div class="container">
+            <h1>Регистрация</h1>
+        </div>
+    </section>
+
+    <section class="account-section">
+        <div class="container">
+            <div class="account-container">
+                <div class="auth-form">
+                    <h2>Создать аккаунт</h2>
+                    <form id="registerForm">
+                        <div class="form-group">
+                            <label for="reg-name">Имя</label>
+                            <input type="text" class="form-control" id="reg-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-surname">Фамилия</label>
+                            <input type="text" class="form-control" id="reg-surname" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-email">Email</label>
+                            <input type="email" class="form-control" id="reg-email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-phone">Телефон</label>
+                            <input type="tel" class="form-control" id="reg-phone" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-company">Компания (необязательно)</label>
+                            <input type="text" class="form-control" id="reg-company">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-password">Пароль</label>
+                            <input type="password" class="form-control" id="reg-password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="reg-confirm-password">Подтвердите пароль</label>
+                            <input type="password" class="form-control" id="reg-confirm-password" required>
+                            <div class="text-danger" id="password-match-error">Пароли не совпадают</div>
+                        </div>
+                        <button type="submit" class="btn">Зарегистрироваться</button>
+                        <div class="text-center mt-3">
+                            <a href="login.html" class="btn-link">Уже есть аккаунт? Войдите</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-column">
+                <h3>Контакты</h3>
+                <ul>
+                    <li>г. Иркутск, ул. Рабочего Штаба, 78/5</li>
+                    <li>Телефон: +7 (395) 248-22-02</li>
+                    <li>Email: prisma-irk@mail.ru</li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Компания</h3>
+                <ul>
+                    <li><a href="mission.html">Наша миссия</a></li>
+                    <li><a href="payment.html">Оплата</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="container copyright">
+            <p>&copy; 2025 ООО"Типография Призма". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
+            authDomain: "prisma-print.firebaseapp.com",
+            projectId: "prisma-print",
+            storageBucket: "prisma-print.appspot.com",
+            messagingSenderId: "165546230296",
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"
+        };
+
+        // Инициализируем Firebase в совместимом режиме (compat)
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Проверка совпадения паролей
+        document.getElementById('reg-confirm-password').addEventListener('input', function() {
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = this.value;
+            const errorElement = document.getElementById('password-match-error');
+            
+            if (password !== confirmPassword && confirmPassword.length > 0) {
+                errorElement.style.display = 'block';
+            } else {
+                errorElement.style.display = 'none';
+            }
+        });
+
+        // Обработка регистрации
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('reg-email').value;
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            
+            // Проверка совпадения паролей
+            if (password !== confirmPassword) {
+                document.getElementById('password-match-error').style.display = 'block';
+                return;
+            }
+
+            try {
+                // 1. Регистрация пользователя
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                
+                // 2. Отправка письма для подтверждения
+                await userCredential.user.sendEmailVerification();
+                
+                // 3. Сохранение дополнительных данных в Firestore
+                await db.collection('clients').doc(userCredential.user.uid).set({
+                    name: document.getElementById('reg-name').value,
+                    surname: document.getElementById('reg-surname').value,
+                    phone: document.getElementById('reg-phone').value,
+                    email: email,
+                    company: document.getElementById('reg-company').value || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    emailVerified: false,
+                    role: 'client'
+                });
+                
+                // Перенаправление на страницу подтверждения
+                window.location.href = 'verify.html';
+                
+            } catch (error) {
+                let errorMessage = 'Ошибка регистрации';
+                switch(error.code) {
+                    case 'auth/email-already-in-use':
+                        errorMessage = 'Этот email уже зарегистрирован';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage = 'Некорректный email';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage = 'Пароль должен содержать не менее 6 символов';
+                        break;
+                    default:
+                        errorMessage = error.message;
+                }
+                alert(errorMessage);
+            }
+        });
+    </script>
+</body>
+</html>

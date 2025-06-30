@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Личный кабинет | Типография Призма</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
+    <style>
+        :root {
+            --primary: #239439;
+            --secondary: #A9B4B5;
+            --dark: #333333;
+            --light: #FFFFFF;
+            --gray: #F5F5F5;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --success: #28a745;
+            --info: #17a2b8;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            color: var(--dark);
+            line-height: 1.6;
+            background-color: var(--gray);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Шапка */
+        header {
+            background-color: var(--primary);
+            padding: 15px 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .logo img {
+            height: 50px;
+            width: auto;
+        }
+        
+        .logo h1 {
+            color: var(--light);
+            font-size: 24px;
+            font-weight: 700;
+        }
+        
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 25px;
+        }
+        
+        nav ul li a {
+            color: var(--light);
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.3s;
+            font-size: 18px;
+            padding: 5px 0;
+            position: relative;
+        }
+        
+        nav ul li a:hover {
+            opacity: 0.8;
+        }
+        
+        nav ul li a::after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            background-color: var(--light);
+            bottom: 0;
+            left: 0;
+            transition: width 0.3s;
+        }
+        
+        nav ul li a:hover::after {
+            width: 100%;
+        }
+        
+        /* Герой-баннер */
+        .hero-account {
+            background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('https://i.vuzopedia.ru/storage/app/uploads/public/5f6/234/043/5f62340436019282505345.jpg') center/cover;
+            color: var(--light);
+            padding: 60px 0;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .hero-account h1 {
+            font-size: 36px;
+            font-weight: 700;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+        
+        /* Секция аккаунта */
+        .account-section {
+            padding: 0 0 50px;
+            flex: 1;
+        }
+        
+        .orders-container {
+            background: var(--light);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .orders-container h2 {
+            color: var(--primary);
+            margin-bottom: 25px;
+            font-size: 28px;
+            text-align: center;
+            position: relative;
+            padding-bottom: 15px;
+        }
+        
+        .orders-container h2::after {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 3px;
+            background-color: var(--secondary);
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+        
+        .order-item {
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.3s;
+            background-color: var(--light);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+        
+        .order-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            border-color: var(--primary);
+        }
+        
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            font-weight: 500;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+        }
+        
+        .order-number {
+            color: var(--primary);
+            font-weight: 600;
+        }
+        
+        .order-date {
+            color: #666;
+            font-size: 14px;
+        }
+        
+        .order-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .order-details p {
+            margin-bottom: 0;
+        }
+        
+        .order-details strong {
+            color: var(--dark);
+            font-weight: 500;
+        }
+        
+        .no-orders {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .no-orders p {
+            font-size: 18px;
+        }
+        
+        /* Стили статусов */
+        .status-processing {
+            color: var(--info);
+            font-weight: 500;
+        }
+        
+        .status-production {
+            color: var(--warning);
+            font-weight: 500;
+        }
+        
+        .status-completed {
+            color: var(--success);
+            font-weight: 500;
+        }
+        
+        .status-shipped {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .status-cancelled {
+            color: var(--error);
+            font-weight: 500;
+        }
+        
+        /* Футер */
+        footer {
+            background-color: var(--dark);
+            color: var(--light);
+            padding: 40px 0 20px;
+            margin-top: auto;
+        }
+        
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .footer-column h3 {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: var(--secondary);
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .footer-column h3::after {
+            content: '';
+            position: absolute;
+            width: 50px;
+            height: 2px;
+            background-color: var(--primary);
+            bottom: 0;
+            left: 0;
+        }
+        
+        .footer-column ul {
+            list-style: none;
+        }
+        
+        .footer-column ul li {
+            margin-bottom: 10px;
+        }
+        
+        .footer-column ul li a {
+            color: var(--light);
+            text-decoration: none;
+            transition: color 0.3s;
+            display: inline-block;
+            padding: 3px 0;
+        }
+        
+        .footer-column ul li a:hover {
+            color: var(--secondary);
+            transform: translateX(5px);
+        }
+        
+        .copyright {
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            color: var(--secondary);
+        }
+        
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            nav ul {
+                gap: 15px;
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .hero-account {
+                padding: 40px 0;
+            }
+            
+            .hero-account h1 {
+                font-size: 28px;
+            }
+            
+            .orders-container {
+                padding: 20px;
+            }
+            
+            .order-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .order-header {
+                flex-direction: column;
+                gap: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container header-content">
+            <div class="logo">
+                <img src="https://xtinaburla.github.io/prismalogo.jpg" alt="Логотип Призма">
+                <h1>Призма</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="#" id="logout-btn">Выйти</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero-account">
+        <div class="container">
+            <h1>Личный кабинет</h1>
+        </div>
+    </section>
+
+    <section class="account-section">
+        <div class="container">
+            <div class="orders-container">
+                <h2>Мои заказы</h2>
+                <div id="orders-list">
+                    <div class="no-orders">
+                        <p>Загрузка ваших заказов...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-column">
+                <h3>Контакты</h3>
+                <ul>
+                    <li>г. Москва, ул. Примерная, 123</li>
+                    <li>Телефон: +7 (123) 456-78-90</li>
+                    <li>Email: info@prisma-print.ru</li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Меню</h3>
+                <ul>
+                    <li><a href="index.html">Главная</a></li>
+                    <li><a href="services.html">Услуги</a></li>
+                    <li><a href="contacts.html">Контакты</a></li>
+                    <li><a href="account.html">Личный кабинет</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h3>Режим работы</h3>
+                <ul>
+                    <li>Пн-Пт: 9:00 - 18:00</li>
+                    <li>Сб: 10:00 - 15:00</li>
+                    <li>Вс: выходной</li>
+                </ul>
+            </div>
+        </div>
+        <div class="container copyright">
+            <p>&copy; 2023 Типография "Призма". Все права защищены.</p>
+        </div>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
+    <script>
+        // Инициализация Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
+            authDomain: "prisma-print.firebaseapp.com",
+            projectId: "prisma-print",
+            storageBucket: "prisma-print.appspot.com",
+            messagingSenderId: "165546230296",
+            appId: "1:165546230296:web:7b816c389d23f5b762396d"
+        };
+
+        // Инициализируем Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // Проверка авторизации пользователя
+        auth.onAuthStateChanged((user) => {
+            if (!user) {
+                // Пользователь не авторизован - перенаправляем на страницу входа
+                window.location.href = 'login.html';
+            } else if (!user.emailVerified) {
+                // Email не подтвержден - перенаправляем на страницу подтверждения
+                window.location.href = 'verify.html';
+            } else {
+                // Пользователь авторизован и email подтвержден - загружаем данные
+                loadUserData(user.uid);
+                loadUserOrders(user.uid);
+            }
+        });
+
+        // Загрузка данных пользователя
+        async function loadUserData(userId) {
+            try {
+                const userDoc = await db.collection('clients').doc(userId).get();
+                if (userDoc.exists) {
+                    const userData = userDoc.data();
+                    // Здесь можно обновить интерфейс данными пользователя
+                    console.log('Данные пользователя:', userData);
+                }
+            } catch (error) {
+                console.error('Ошибка загрузки данных пользователя:', error);
+            }
+        }
+
+        // Загрузка заказов пользователя
+        async function loadUserOrders(userId) {
+            try {
+                const ordersList = document.getElementById('orders-list');
+                
+                // Показываем индикатор загрузки
+                ordersList.innerHTML = `
+                    <div class="no-orders">
+                        <p>Загрузка ваших заказов...</p>
+                    </div>
+                `;
+
+                // Получаем заказы пользователя из Firestore
+                const querySnapshot = await db.collection('orders')
+                    .where('userId', '==', userId)
+                    .orderBy('createdAt', 'desc')
+                    .get();
+
+                // Проверяем есть ли заказы
+                if (querySnapshot.empty) {
+                    ordersList.innerHTML = `
+                        <div class="no-orders">
+                            <p>У вас пока нет заказов</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Очищаем список перед добавлением новых элементов
+                ordersList.innerHTML = '';
+
+                // Перебираем все заказы и добавляем их в список
+                querySnapshot.forEach((doc) => {
+                    const order = doc.data();
+                    const orderDate = order.createdAt.toDate().toLocaleDateString('ru-RU', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                    
+                    // Форматируем сумму заказа
+                    const orderPrice = order.price ? new Intl.NumberFormat('ru-RU', {
+                        style: 'currency',
+                        currency: 'RUB',
+                        minimumFractionDigits: 0
+                    }).format(order.price) : 'Цена не указана';
+
+                    // Создаем HTML для заказа
+                    const orderElement = `
+                        <div class="order-item">
+                            <div class="order-header">
+                                <span class="order-number">Заказ #${doc.id.substring(0, 8)}</span>
+                                <span class="order-date">${orderDate}</span>
+                            </div>
+                            <div class="order-details">
+                                <p><strong>Тип:</strong> ${order.productType || 'Не указан'}</p>
+                                <p><strong>Статус:</strong> <span class="status-${order.status || 'processing'}">${getStatusText(order.status)}</span></p>
+                                <p><strong>Сумма:</strong> ${orderPrice}</p>
+                                ${order.comment ? `<p><strong>Комментарий:</strong> ${order.comment}</p>` : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    // Добавляем заказ в список
+                    ordersList.innerHTML += orderElement;
+                });
+
+            } catch (error) {
+                console.error('Ошибка загрузки заказов:', error);
+                document.getElementById('orders-list').innerHTML = `
+                    <div class="no-orders">
+                        <p>Произошла ошибка при загрузке заказов. Пожалуйста, попробуйте позже.</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Функция для преобразования статуса заказа в читаемый текст
+        function getStatusText(status) {
+            const statusMap = {
+                'processing': 'В обработке',
+                'production': 'В производстве',
+                'completed': 'Завершен',
+                'shipped': 'Отправлен',
+                'cancelled': 'Отменен'
+            };
+            return statusMap[status] || status || 'В обработке';
+        }
+
+        // Выход из системы
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'login.html';
+            }).catch((error) => {
+                console.error('Ошибка при выходе:', error);
+                alert('Произошла ошибка при выходе из системы. Пожалуйста, попробуйте еще раз.');
+            });
+        });
+
+        // Реализация real-time обновления заказов
+        function setupOrdersListener(userId) {
+            return db.collection('orders')
+                .where('userId', '==', userId)
+                .orderBy('createdAt', 'desc')
+                .onSnapshot((snapshot) => {
+                    // Обрабатываем изменения в реальном времени
+                    snapshot.docChanges().forEach((change) => {
+                        if (change.type === 'added' || change.type === 'modified') {
+                            // Обновляем интерфейс при добавлении/изменении заказов
+                            loadUserOrders(userId);
+                        }
+                    });
+                }, (error) => {
+                    console.error('Ошибка real-time обновления:', error);
+                });
+        }
+
+        // При загрузке страницы подписываемся на обновления
+        let unsubscribeOrders;
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                unsubscribeOrders = setupOrdersListener(user.uid);
+            } else if (unsubscribeOrders) {
+                // Отписываемся от обновлений при выходе
+                unsubscribeOrders();
+            }
+        });
+    </script>
+</body>
+</html>
