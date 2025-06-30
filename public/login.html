@@ -306,8 +306,10 @@
         </div>
     </footer>
 
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
     <script>
-        // Инициализация Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -317,81 +319,67 @@
             appId: "1:165546230296:web:7b816c389d23f5b762396d"
         };
 
-        // Инициализируем Firebase в совместимом режиме
         firebase.initializeApp(firebaseConfig);
         const auth = firebase.auth();
         const db = firebase.firestore();
 
-        // Обработка формы входа
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+        document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
-            const loginBtn = document.getElementById('login-btn');
-            const errorElement = document.getElementById('login-error');
+            const btn = document.getElementById('login-btn');
+            const errorElement = document.createElement('div');
+            errorElement.className = 'error-message';
+            errorElement.style.color = 'var(--error)';
+            errorElement.style.marginTop = '10px';
             
-            // Скрываем предыдущие ошибки
-            errorElement.style.display = 'none';
-            
-            // Блокируем кнопку входа
-            loginBtn.disabled = true;
-            loginBtn.textContent = 'Вход...';
-            
+            btn.disabled = true;
+            btn.textContent = 'Вход...';
+
             try {
-                // Пытаемся войти с помощью email и пароля
+                // 1. Пытаемся войти
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
-                // Проверяем, подтвержден ли email
+                // 2. Проверяем подтверждение email
                 if (!user.emailVerified) {
                     await auth.signOut();
-                    throw new Error('Пожалуйста, подтвердите ваш email перед входом. Проверьте вашу почту (включая папку "Спам").');
+                    throw new Error('Подтвердите email перед входом');
                 }
                 
-                // Перенаправление в личный кабинет после успешного входа
+                // 3. Проверяем наличие пользователя в Firestore
+                const userDoc = await db.collection('clients').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await auth.signOut();
+                    throw new Error('Пользователь не найден');
+                }
+                
+                // 4. Перенаправляем в личный кабинет
                 window.location.href = 'account.html';
                 
             } catch (error) {
-                // Обрабатываем ошибки входа
                 let errorMessage = 'Ошибка входа';
-                
                 switch(error.code) {
-                    case 'auth/invalid-email':
-                        errorMessage = 'Некорректный email адрес';
-                        break;
-                    case 'auth/user-disabled':
-                        errorMessage = 'Аккаунт заблокирован';
+                    case 'auth/wrong-password':
+                        errorMessage = 'Неверный пароль';
                         break;
                     case 'auth/user-not-found':
-                    case 'auth/wrong-password':
-                        errorMessage = 'Неверный email или пароль';
+                        errorMessage = 'Пользователь не найден';
                         break;
-                    case 'auth/too-many-requests':
-                        errorMessage = 'Слишком много попыток входа. Попробуйте позже.';
+                    case 'auth/invalid-email':
+                        errorMessage = 'Некорректный email';
                         break;
                     default:
-                        errorMessage = error.message || 'Произошла ошибка при входе';
+                        errorMessage = error.message;
                 }
                 
-                // Показываем сообщение об ошибке
                 errorElement.textContent = errorMessage;
-                errorElement.style.display = 'block';
-                
-                console.error('Ошибка входа:', error);
+                document.getElementById('loginForm').appendChild(errorElement);
                 
             } finally {
-                // Разблокируем кнопку входа
-                loginBtn.disabled = false;
-                loginBtn.textContent = 'Войти';
-            }
-        });
-
-        // Проверка состояния аутентификации
-        auth.onAuthStateChanged((user) => {
-            if (user && user.emailVerified) {
-                // Если пользователь уже авторизован и email подтвержден, перенаправляем в личный кабинет
-                window.location.href = 'account.html';
+                btn.disabled = false;
+                btn.textContent = 'Войти';
             }
         });
     </script>
