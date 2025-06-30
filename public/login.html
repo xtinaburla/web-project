@@ -291,7 +291,7 @@
 
     <script>
         // Инициализация Firebase
-        const firebaseConfig = {
+                const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
             projectId: "prisma-print",
@@ -310,28 +310,66 @@
             
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Вход...';
             
             try {
                 const userCredential = await auth.signInWithEmailAndPassword(email, password);
                 const user = userCredential.user;
                 
                 if (user && !user.emailVerified) {
-                    alert('Пожалуйста, подтвердите ваш email перед входом.');
+                    if (confirm('Ваш email не подтверждён. Отправить письмо подтверждения снова?')) {
+                        await user.sendEmailVerification({
+                            url: window.location.origin + '/verify.html'
+                        });
+                        alert('Письмо отправлено! Пожалуйста, подтвердите email перед входом.');
+                    }
                     await auth.signOut();
                     return;
                 }
                 
-                // Перенаправление в личный кабинет после успешного входа
+                // Проверяем наличие профиля пользователя в Firestore
+                const userDoc = await db.collection('clients').doc(user.uid).get();
+                if (!userDoc.exists) {
+                    await auth.signOut();
+                    throw new Error('Профиль пользователя не найден');
+                }
+                
+                // Успешный вход
                 window.location.href = 'account.html';
+                
             } catch (error) {
-                alert('Ошибка входа: ' + error.message);
+                let errorMessage = 'Ошибка входа';
+                switch(error.code) {
+                    case 'auth/user-not-found':
+                    case 'auth/wrong-password':
+                        errorMessage = 'Неверный email или пароль';
+                        break;
+                    case 'auth/too-many-requests':
+                        errorMessage = 'Слишком много попыток. Попробуйте позже';
+                        break;
+                    default:
+                        errorMessage = error.message || 'Произошла ошибка при входе';
+                }
+                alert(errorMessage);
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Войти';
             }
         });
 
-        // Проверка состояния аутентификации
+        // Проверка состояния аутентификации (для уже авторизованных пользователей)
         auth.onAuthStateChanged((user) => {
             if (user && user.emailVerified) {
-                window.location.href = 'account.html';
+                // Дополнительная проверка наличия профиля
+                db.collection('clients').doc(user.uid).get()
+                    .then(doc => {
+                        if (doc.exists) {
+                            window.location.href = 'account.html';
+                        }
+                    });
             }
         });
     </script>
