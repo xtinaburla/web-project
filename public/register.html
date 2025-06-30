@@ -416,6 +416,7 @@
             const email = document.getElementById('reg-email').value;
             const password = document.getElementById('reg-password').value;
             const confirmPassword = document.getElementById('reg-confirm-password').value;
+            const btn = e.target.querySelector('button[type="submit"]');
             
             // Проверка совпадения паролей
             if (password !== confirmPassword) {
@@ -423,15 +424,23 @@
                 return;
             }
 
+            // Блокируем кнопку на время регистрации
+            btn.disabled = true;
+            btn.textContent = 'Регистрация...';
+
             try {
                 // 1. Регистрация пользователя
                 const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
                 
                 // 2. Отправка письма для подтверждения
-                await userCredential.user.sendEmailVerification();
+                await user.sendEmailVerification({
+                    url: window.location.origin + '/verify.html', // URL для перенаправления после подтверждения
+                    handleCodeInApp: true
+                });
                 
                 // 3. Сохранение дополнительных данных в Firestore
-                await db.collection('clients').doc(userCredential.user.uid).set({
+                await db.collection('clients').doc(user.uid).set({
                     name: document.getElementById('reg-name').value,
                     surname: document.getElementById('reg-surname').value,
                     phone: document.getElementById('reg-phone').value,
@@ -439,10 +448,14 @@
                     company: document.getElementById('reg-company').value || '',
                     createdAt: firebase.firestore.FieldValue.serverTimestamp(),
                     emailVerified: false,
-                    role: 'client'
+                    role: 'client',
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                 });
                 
-                // Перенаправление на страницу подтверждения
+                // 4. Показываем сообщение об успешной регистрации
+                alert('Регистрация успешна! Письмо с подтверждением отправлено на ваш email. Пожалуйста, проверьте вашу почту (включая папку "Спам").');
+                
+                // 5. Перенаправление на страницу подтверждения
                 window.location.href = 'verify.html';
                 
             } catch (error) {
@@ -457,10 +470,28 @@
                     case 'auth/weak-password':
                         errorMessage = 'Пароль должен содержать не менее 6 символов';
                         break;
+                    case 'auth/operation-not-allowed':
+                        errorMessage = 'Регистрация по email/password отключена';
+                        break;
                     default:
-                        errorMessage = error.message;
+                        errorMessage = error.message || 'Неизвестная ошибка';
                 }
+                
                 alert(errorMessage);
+                console.error('Ошибка регистрации:', error);
+                
+            } finally {
+                // Разблокируем кнопку в любом случае
+                btn.disabled = false;
+                btn.textContent = 'Зарегистрироваться';
+            }
+        });
+
+        // Проверяем состояние аутентификации
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // Если пользователь уже авторизован, перенаправляем
+                window.location.href = 'account.html';
             }
         });
     </script>
