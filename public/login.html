@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
+        /* Стили остаются без изменений */
         :root {
             --primary: #239439;
             --primary-dark: #1c7a2e;
@@ -291,7 +292,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore-compat.js"></script>
-<script>
+    <script>
         const firebaseConfig = {
             apiKey: "AIzaSyCDurrGed-JcaBRJgEYb2eeM8G-Je-yrWA",
             authDomain: "prisma-print.firebaseapp.com",
@@ -344,7 +345,7 @@
                     // Если email не подтвержден, предлагаем отправить письмо повторно
                     if (confirm('Ваш email не подтвержден. Отправить письмо подтверждения снова?')) {
                         await user.sendEmailVerification({
-                            url: window.location.origin + '/verify.html'
+                            url: window.location.origin + '/login.html'
                         });
                         showStatus('Письмо отправлено! Пожалуйста, подтвердите email.', 'success');
                     }
